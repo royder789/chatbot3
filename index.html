@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+
+        :root {
+            --accent: #00f5ff;
+        }
+
+        * {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, box-shadow;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms;
+        }
+
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+
+        .title-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            background: radial-gradient(circle at 30% 20%, #0a0a1f 0%, #000000 70%);
+        }
+
+        /* Sidebar - Futuristic dark glass */
+        .sidebar {
+            width: 280px;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(0, 245, 255, 0.15);
+            box-shadow: 4px 0 30px -10px rgba(0, 245, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Chat Window */
+        #chat-window {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 60px 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            background: 
+                radial-gradient(circle at center, rgba(0, 245, 255, 0.03) 0%, transparent 70%),
+                #05050f;
+            background-size: 100% 100%;
+        }
+
+        #chat-window::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #chat-window::-webkit-scrollbar-thumb {
+            background: linear-gradient(#00f5ff, #00aaff);
+            border-radius: 20px;
+        }
+
+        /* Message containers */
+        .message-wrapper {
+            display: flex;
+            gap: 16px;
+            animation: messagePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes messagePop {
+            0% { opacity: 0; transform: scale(0.95) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* AI Message Bubble - Glass + Neon */
+        .ai-bubble {
+            max-width: 70%;
+            padding: 18px 24px;
+            background: rgba(30, 30, 55, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            border-radius: 28px 28px 28px 8px;
+            box-shadow: 
+                0 10px 30px -10px rgba(0, 245, 255, 0.3),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            color: #e0f8ff;
+            position: relative;
+        }
+
+        .ai-bubble::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            bottom: 12px;
+            width: 12px;
+            height: 12px;
+            background: rgba(30, 30, 55, 0.85);
+            border-left: 1px solid rgba(0, 245, 255, 0.2);
+            border-bottom: 1px solid rgba(0, 245, 255, 0.2);
+            transform: rotate(45deg);
+            z-index: -1;
+        }
+
+        /* User Message Bubble - Electric gradient */
+        .user-bubble {
+            max-width: 70%;
+            padding: 18px 24px;
+            background: linear-gradient(90deg, #00f5ff, #0099ff);
+            border-radius: 28px 28px 8px 28px;
+            box-shadow: 
+                0 10px 30px -10px #00f5ff,
+                0 0 0 1px rgba(255,255,255,0.3) inset;
+            color: #001122;
+            font-weight: 500;
+        }
+
+        /* Avatars */
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 0 20px -5px var(--accent);
+        }
+
+        /* Input Area - Ultimate glassmorphic */
+        .input-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 24px 60px 32px;
+            background: linear-gradient(180deg, transparent, #05050f 30%);
+        }
+
+        .input-wrapper {
+            background: rgba(15, 15, 35, 0.85);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(0, 245, 255, 0.25);
+            border-radius: 9999px;
+            padding: 8px 12px;
+            box-shadow: 
+                0 20px 40px -15px rgba(0, 245, 255, 0.4),
+                inset 0 2px 0 rgba(255,255,255,0.15);
+        }
+
+        input {
+            background: transparent;
+            font-size: 17px;
+            line-height: 1.4;
+        }
+
+        .send-btn {
+            background: linear-gradient(90deg, #00f5ff, #0099ff);
+            color: #001122;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px #00f5ff;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.08) rotate(12deg);
+            box-shadow: 0 0 35px #00f5ff;
+        }
+
+        /* Typing indicator - Futuristic */
+        .typing {
+            display: none;
+            align-items: center;
+            gap: 16px;
+            padding-left: 20px;
+        }
+
+        .typing-dot {
+            animation: typingBounce 1.2s infinite;
+        }
+
+        @keyframes typingBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* History items */
+        .history-item {
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .history-item.active {
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.4);
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body class="bg-black text-white">
+
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <!-- Logo -->
+            <div class="px-6 pt-8 pb-6 flex items-center gap-x-3 border-b border-white/10">
+                <div class="avatar bg-gradient-to-br from-[#00f5ff] to-[#0099ff] shadow-[0_0_25px_-5px_#00f5ff]">
+                    <i class="fas fa-brain text-2xl"></i>
+                </div>
+                <div class="title-font text-3xl tracking-[-2px]">NEXUS</div>
+                <div class="px-3 py-px text-xs font-bold bg-white/10 text-[#00f5ff] rounded-3xl tracking-[1px] mt-1">AI</div>
+            </div>
+
+            <!-- New Chat Button -->
+            <div onclick="startNewChat()" 
+                 class="new-chat-btn mx-4 mt-8 flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-[#00f5ff]/30 hover:border-[#00f5ff] text-[#00f5ff] font-semibold py-5 px-6 rounded-3xl text-sm tracking-[0.5px] uppercase">
+                <i class="fas fa-plus text-lg"></i>
+                <span>NEW CONVERSATION</span>
+            </div>
+
+            <!-- History -->
+            <div class="flex-1 overflow-y-auto px-4 mt-6">
+                <div class="text-xs font-medium text-white/40 px-4 mb-4 tracking-widest">RECENT SESSIONS</div>
+                <div id="chat-history-list" class="flex flex-col gap-2 px-2">
+                </div>
+            </div>
+
+            <!-- Session footer -->
+            <div class="mt-auto p-6 border-t border-white/10 text-xs font-mono flex items-center justify-between text-white/50">
+                <div>SESSION <span id="session-display" class="text-[#00f5ff]"></span></div>
+                <div class="flex items-center gap-1.5">
+                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    ONLINE
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CHAT AREA -->
+        <div class="chat-main flex-1 flex flex-col relative">
+            
+            <!-- Top Bar -->
+            <div class="h-16 bg-white/5 backdrop-blur-xl border-b border-white/10 px-10 flex items-center justify-between z-10">
+                <div class="flex items-center gap-x-4">
+                    <div class="avatar bg-gradient-to-br from-[#00f5ff] to-[#0099ff] text-xl">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        <h1 class="title-font text-2xl tracking-[-1px]">AI Assistant</h1>
+                        <p class="text-xs text-[#00f5ff]/70 font-medium -mt-1">NEURAL • FUTURISTIC • v2.4</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-8 text-sm">
+                    <div id="header-session-display" class="font-mono text-[#00f5ff]/80"></div>
+                    <button onclick="startNewChat()" 
+                            class="flex items-center gap-2 text-white/70 hover:text-[#00f5ff]">
+                        <i class="fas fa-arrows-rotate"></i>
+                        <span class="font-medium">RESET THREAD</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div id="chat-window"></div>
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <div id="typing-indicator" class="typing">
+                    <div class="avatar bg-gradient-to-br from-[#00f5ff] to-[#0099ff]">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="typing-dot w-3 h-3 bg-[#00f5ff] rounded-full" style="animation-delay: 0ms"></div>
+                        <div class="typing-dot w-3 h-3 bg-[#00f5ff] rounded-full" style="animation-delay: 150ms"></div>
+                        <div class="typing-dot w-3 h-3 bg-[#00f5ff] rounded-full" style="animation-delay: 300ms"></div>
+                    </div>
+                    <span class="text-white/50 text-sm font-medium ml-2">NEXUS is synthesizing response...</span>
+                </div>
+
+                <div class="input-wrapper flex items-center">
+                    
+                    <input 
+                        type="text" 
+                        id="msg" 
+                        placeholder="Describe the future... or ask anything" 
+                        autocomplete="off"
+                        class="flex-1 px-8 outline-none placeholder:text-white/40 text-white text-[17px]">
+                    <button onclick="send()" class="send-btn">
+                        <i class="fas fa-paper-plane text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="text-center text-[10px] text-white/30 mt-4 tracking-widest font-medium">
+                    SECURE • PRIVATE • POWERED BY NEXT-GEN NEURAL ARCHITECTURE
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tailwind initialization for extra utilities
+        tailwind.config = {
+            content: [],
+            theme: {
+                extend: {}
+            }
+        };
+
+        const chatWindow = document.getElementById("chat-window");
+        const msgInput = document.getElementById("msg");
+        const historyList = document.getElementById("chat-history-list");
+        const sessionDisplay = document.getElementById("session-display");
+        const headerSessionDisplay = document.getElementById("header-session-display");
+
+        let sessions = JSON.parse(localStorage.getItem("chat_sessions")) || [];
+        let currentSessionId = localStorage.getItem("active_session");
+
+        function init() {
+            if (!currentSessionId) {
+                startNewChat();
+            } else {
+                sessionDisplay.innerText = currentSessionId;
+                headerSessionDisplay.innerText = currentSessionId;
+                renderHistoryList();
+            }
+        }
+
+        function startNewChat() {
+            currentSessionId = "Chat_" + Math.floor(Math.random() * 10000);
+            sessions.unshift(currentSessionId);
+            if (sessions.length > 10) sessions.pop();
+
+            localStorage.setItem("chat_sessions", JSON.stringify(sessions));
+            localStorage.setItem("active_session", currentSessionId);
+
+            sessionDisplay.innerText = currentSessionId;
+            headerSessionDisplay.innerText = currentSessionId;
+
+            chatWindow.innerHTML = `
+                <div class="message-wrapper justify-start">
+                    <div class="avatar bg-gradient-to-br from-[#00f5ff] to-[#0099ff]">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="ai-bubble">
+                        New conversation initialized.<br>
+                        I'm ready. What future shall we explore today?
+                    </div>
+                </div>
+            `;
+            renderHistoryList();
+        }
+
+        function switchSession(id) {
+            currentSessionId = id;
+            localStorage.setItem("active_session", id);
+            sessionDisplay.innerText = id;
+            headerSessionDisplay.innerText = id;
+
+            chatWindow.innerHTML = `
+                <div class="message-wrapper justify-start">
+                    <div class="avatar bg-gradient-to-br from-[#00f5ff] to-[#0099ff]">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="ai-bubble">
+                        Welcome back to session <span class="font-mono">${id}</span>.<br>
+                        The neural network is fully synced. How can I assist?
+                    </div>
+                </div>
+            `;
+            renderHistoryList();
+        }
+
+        function renderHistoryList() {
+            historyList.innerHTML = "";
+            sessions.forEach(id => {
+                const item = document.createElement("div");
+                item.className = `history-item flex items-center gap-3 px-5 py-4 text-sm cursor-pointer ${id === currentSessionId ? 'active' : 'hover:bg-white/5'}`;
+                item.innerHTML = `
+                    <i class="fas fa-comment-dots text-[#00f5ff]/70"></i>
+                    <span class="flex-1 truncate font-medium">${id}</span>
+                `;
+                item.onclick = () => switchSession(id);
+                historyList.appendChild(item);
+            });
+        }
+
+        async function send() {
+            let msg = msgInput.value.trim();
+            if (!msg) return;
+
+            appendMessage("user", msg);
+            msgInput.value = "";
+            const typingIndicator = document.getElementById("typing-indicator");
+            typingIndicator.style.display = "flex";
+
+            try {
+                let res = await fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        message: msg,
+                        session_id: currentSessionId
+                    })
+                });
+                let data = await res.json();
+                typingIndicator.style.display = "none";
+                appendMessage("ai", data.response);
+            } catch (e) {
+                typingIndicator.style.display = "none";
+                appendMessage("ai", "Connection lost in the neural grid. Please try again.");
+            }
+        }
+
+        function appendMessage(role, text) {
+            const wrapper = document.createElement("div");
+            wrapper.className = `message-wrapper ${role === "user" ? "justify-end" : "justify-start"}`;
+
+            if (role === "ai") {
+                wrapper.innerHTML = `
+                    <div class="avatar bg-gradient-to-br from-[#00f5ff] to-[#0099ff]">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="ai-bubble">${text}</div>
+                `;
+            } else {
+                wrapper.innerHTML = `
+                    <div class="user-bubble">${text}</div>
+                    <div class="avatar bg-gradient-to-br from-[#0099ff] to-[#0066cc]">
+                        <i class="fas fa-user"></i>
+                    </div>
+                `;
+            }
+
+            chatWindow.appendChild(wrapper);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // Keyboard support
+        msgInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") send();
+        });
+
+        init();
+    </script>
+</body>
+
+</html>
