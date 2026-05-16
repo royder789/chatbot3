@@ -1,459 +1,922 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Assistant</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COSMOS — Space AI Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #02030a;
+    --deep: #060818;
+    --nebula: #0d1230;
+    --star: #e8f0ff;
+    --pulsar: #4fc3f7;
+    --nova: #7c4dff;
+    --supernova: #ff6d00;
+    --aurora: #00e5ff;
+    --dim: rgba(232,240,255,0.45);
+    --border: rgba(79,195,247,0.2);
+    --glow: rgba(79,195,247,0.12);
+  }
 
-        :root {
-            --accent: #00f5ff;
-        }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        * {
-            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, box-shadow;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 200ms;
-        }
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--void);
+    color: var(--star);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+  }
 
-        body {
-            font-family: 'Inter', system_ui, sans-serif;
-        }
+  /* Starfield background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(124,77,255,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(0,229,255,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 80%, rgba(79,195,247,0.05) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-        .title-font {
-            font-family: 'Space Grotesk', sans-serif;
-        }
+  /* Stars */
+  .stars {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .stars::before, .stars::after {
+    content: '';
+    position: absolute;
+    width: 2px; height: 2px;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow:
+      120px 30px 0 rgba(232,240,255,0.7),
+      340px 80px 0 rgba(232,240,255,0.5),
+      580px 140px 0 rgba(232,240,255,0.8),
+      800px 200px 0 rgba(232,240,255,0.4),
+      1050px 60px 0 rgba(232,240,255,0.6),
+      1300px 160px 0 rgba(232,240,255,0.7),
+      200px 320px 0 rgba(232,240,255,0.5),
+      450px 400px 0 rgba(232,240,255,0.3),
+      700px 280px 0 rgba(232,240,255,0.6),
+      950px 380px 0 rgba(232,240,255,0.8),
+      1150px 320px 0 rgba(232,240,255,0.4),
+      80px 500px 0 rgba(232,240,255,0.5),
+      380px 560px 0 rgba(232,240,255,0.7),
+      620px 480px 0 rgba(232,240,255,0.3),
+      880px 530px 0 rgba(232,240,255,0.6),
+      1200px 470px 0 rgba(232,240,255,0.5),
+      1400px 40px 0 rgba(79,195,247,0.8),
+      1460px 340px 0 rgba(124,77,255,0.7),
+      30px 700px 0 rgba(232,240,255,0.4),
+      260px 720px 0 rgba(232,240,255,0.6),
+      500px 680px 0 rgba(232,240,255,0.5),
+      760px 740px 0 rgba(232,240,255,0.7);
+    animation: twinkle 4s infinite alternate;
+  }
+  .stars::after {
+    box-shadow:
+      160px 110px 0 rgba(232,240,255,0.6),
+      400px 40px 0 rgba(232,240,255,0.4),
+      640px 200px 0 rgba(232,240,255,0.7),
+      900px 130px 0 rgba(232,240,255,0.5),
+      1100px 90px 0 rgba(232,240,255,0.8),
+      300px 440px 0 rgba(79,195,247,0.5),
+      550px 360px 0 rgba(232,240,255,0.4),
+      820px 460px 0 rgba(232,240,255,0.6),
+      1000px 290px 0 rgba(232,240,255,0.7),
+      1350px 200px 0 rgba(232,240,255,0.5),
+      50px 600px 0 rgba(232,240,255,0.4),
+      340px 650px 0 rgba(124,77,255,0.6),
+      680px 600px 0 rgba(232,240,255,0.5),
+      1100px 580px 0 rgba(232,240,255,0.7);
+    animation-duration: 6s;
+    animation-delay: -2s;
+  }
+  @keyframes twinkle {
+    0% { opacity: 0.4; }
+    100% { opacity: 1; }
+  }
 
-        .app-container {
-            display: flex;
-            height: 100vh;
-            background: radial-gradient(circle at 30% 20%, #0a0a1f 0%, #000000 70%);
-        }
+  /* ── SIDEBAR ─────────────────────────────────────────── */
+  .sidebar {
+    width: 270px;
+    min-width: 270px;
+    background: rgba(6,8,24,0.92);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 10;
+    backdrop-filter: blur(20px);
+  }
 
-        /* Sidebar - Futuristic dark glass */
-        .sidebar {
-            width: 280px;
-            background: rgba(15, 15, 35, 0.95);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(0, 245, 255, 0.15);
-            box-shadow: 4px 0 30px -10px rgba(0, 245, 255, 0.2);
-            display: flex;
-            flex-direction: column;
-        }
+  .logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--nova), var(--pulsar));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    margin-bottom: 12px;
+    box-shadow: 0 0 20px rgba(124,77,255,0.4);
+  }
+  .logo h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    background: linear-gradient(90deg, var(--aurora), var(--nova));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .logo p {
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 2px;
+    margin-top: 2px;
+  }
 
-        /* Chat Window */
-        #chat-window {
-            flex: 1;
-            overflow-y: auto;
-            padding: 40px 60px 120px;
-            display: flex;
-            flex-direction: column;
-            gap: 32px;
-            background: 
-                radial-gradient(circle at center, rgba(0, 245, 255, 0.03) 0%, transparent 70%),
-                #05050f;
-            background-size: 100% 100%;
-        }
+  .new-chat-btn {
+    margin: 16px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(79,195,247,0.1), rgba(124,77,255,0.1));
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--aurora);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .new-chat-btn:hover {
+    background: linear-gradient(135deg, rgba(79,195,247,0.2), rgba(124,77,255,0.2));
+    box-shadow: 0 0 20px rgba(79,195,247,0.2);
+    transform: translateY(-1px);
+  }
+  .new-chat-btn span { font-size: 18px; }
 
-        #chat-window::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        #chat-window::-webkit-scrollbar-thumb {
-            background: linear-gradient(#00f5ff, #00aaff);
-            border-radius: 20px;
-        }
+  .history-label {
+    padding: 12px 20px 6px;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgba(232,240,255,0.3);
+    font-family: 'Orbitron', sans-serif;
+  }
 
-        /* Message containers */
-        .message-wrapper {
-            display: flex;
-            gap: 16px;
-            animation: messagePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+  .history-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 12px;
+  }
+  .history-list::-webkit-scrollbar { width: 3px; }
+  .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-        @keyframes messagePop {
-            0% { opacity: 0; transform: scale(0.95) translateY(20px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
+  .session-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--dim);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+  }
+  .session-item:hover { background: var(--glow); color: var(--star); }
+  .session-item.active {
+    background: linear-gradient(135deg, rgba(79,195,247,0.15), rgba(124,77,255,0.1));
+    border: 1px solid rgba(79,195,247,0.3);
+    color: var(--aurora);
+  }
+  .session-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--nova); flex-shrink: 0; }
+  .session-item.active .session-dot { background: var(--aurora); box-shadow: 0 0 6px var(--aurora); }
+  .session-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* AI Message Bubble - Glass + Neon */
-        .ai-bubble {
-            max-width: 70%;
-            padding: 18px 24px;
-            background: rgba(30, 30, 55, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 245, 255, 0.2);
-            border-radius: 28px 28px 28px 8px;
-            box-shadow: 
-                0 10px 30px -10px rgba(0, 245, 255, 0.3),
-                inset 0 1px 0 rgba(255,255,255,0.1);
-            color: #e0f8ff;
-            position: relative;
-        }
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 10px;
+    color: rgba(232,240,255,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .online-dot {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .pulse {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #00e676;
+    animation: pulse-anim 2s infinite;
+  }
+  @keyframes pulse-anim {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,230,118,0.4); }
+    50% { box-shadow: 0 0 0 5px rgba(0,230,118,0); }
+  }
 
-        .ai-bubble::before {
-            content: '';
-            position: absolute;
-            left: -6px;
-            bottom: 12px;
-            width: 12px;
-            height: 12px;
-            background: rgba(30, 30, 55, 0.85);
-            border-left: 1px solid rgba(0, 245, 255, 0.2);
-            border-bottom: 1px solid rgba(0, 245, 255, 0.2);
-            transform: rotate(45deg);
-            z-index: -1;
-        }
+  /* ── MAIN AREA ───────────────────────────────────────── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 5;
+    overflow: hidden;
+  }
 
-        /* User Message Bubble - Electric gradient */
-        .user-bubble {
-            max-width: 70%;
-            padding: 18px 24px;
-            background: linear-gradient(90deg, #00f5ff, #0099ff);
-            border-radius: 28px 28px 8px 28px;
-            box-shadow: 
-                0 10px 30px -10px #00f5ff,
-                0 0 0 1px rgba(255,255,255,0.3) inset;
-            color: #001122;
-            font-weight: 500;
-        }
+  .topbar {
+    height: 64px;
+    background: rgba(6,8,24,0.7);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    flex-shrink: 0;
+  }
+  .topbar-left {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .topbar-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--nova), var(--pulsar));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 0 15px rgba(124,77,255,0.3);
+  }
+  .topbar-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--star);
+  }
+  .topbar-sub {
+    font-size: 10px;
+    color: var(--pulsar);
+    letter-spacing: 2px;
+  }
+  .topbar-right {
+    display: flex; align-items: center; gap: 20px;
+  }
+  .topbar-session {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    color: rgba(79,195,247,0.6);
+    letter-spacing: 1px;
+  }
+  .reset-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--dim); padding: 6px 14px; border-radius: 6px;
+    font-size: 11px; letter-spacing: 1px; cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    transition: all 0.2s;
+  }
+  .reset-btn:hover { border-color: var(--pulsar); color: var(--pulsar); }
 
-        /* Avatars */
-        .avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 0 20px -5px var(--accent);
-        }
+  /* ── CHAT WINDOW ─────────────────────────────────────── */
+  #chat-window {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 40px 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  #chat-window::-webkit-scrollbar { width: 4px; }
+  #chat-window::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--pulsar), var(--nova));
+    border-radius: 4px;
+  }
 
-        /* Input Area - Ultimate glassmorphic */
-        .input-container {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 24px 60px 32px;
-            background: linear-gradient(180deg, transparent, #05050f 30%);
-        }
+  /* ── MESSAGES ─────────────────────────────────────────── */
+  .msg-row {
+    display: flex;
+    gap: 14px;
+    animation: floatIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes floatIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to { opacity: 1; transform: none; }
+  }
+  .msg-row.user { flex-direction: row-reverse; }
 
-        .input-wrapper {
-            background: rgba(15, 15, 35, 0.85);
-            backdrop-filter: blur(24px);
-            border: 1px solid rgba(0, 245, 255, 0.25);
-            border-radius: 9999px;
-            padding: 8px 12px;
-            box-shadow: 
-                0 20px 40px -15px rgba(0, 245, 255, 0.4),
-                inset 0 2px 0 rgba(255,255,255,0.15);
-        }
+  .msg-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .ai-avatar {
+    background: linear-gradient(135deg, var(--nova), var(--pulsar));
+    box-shadow: 0 0 12px rgba(124,77,255,0.4);
+  }
+  .user-avatar {
+    background: linear-gradient(135deg, #1565c0, #0d47a1);
+    box-shadow: 0 0 12px rgba(21,101,192,0.4);
+  }
 
-        input {
-            background: transparent;
-            font-size: 17px;
-            line-height: 1.4;
-        }
+  .msg-bubble {
+    max-width: 68%;
+    padding: 14px 20px;
+    border-radius: 18px;
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .ai-bubble {
+    background: rgba(13,18,48,0.9);
+    border: 1px solid rgba(79,195,247,0.2);
+    border-radius: 4px 18px 18px 18px;
+    color: var(--star);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .user-bubble {
+    background: linear-gradient(135deg, rgba(79,195,247,0.15), rgba(124,77,255,0.2));
+    border: 1px solid rgba(79,195,247,0.3);
+    border-radius: 18px 4px 18px 18px;
+    color: var(--star);
+  }
 
-        .send-btn {
-            background: linear-gradient(90deg, #00f5ff, #0099ff);
-            color: #001122;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 25px #00f5ff;
-        }
+  .msg-image-preview {
+    max-width: 200px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    display: block;
+  }
 
-        .send-btn:hover {
-            transform: scale(1.08) rotate(12deg);
-            box-shadow: 0 0 35px #00f5ff;
-        }
+  /* ── TYPING INDICATOR ─────────────────────────────────── */
+  #typing-indicator {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    padding-left: 4px;
+  }
+  .typing-dots {
+    display: flex; gap: 5px;
+    background: rgba(13,18,48,0.9);
+    border: 1px solid rgba(79,195,247,0.2);
+    border-radius: 18px;
+    padding: 14px 18px;
+  }
+  .typing-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--pulsar);
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.5; }
+    50% { transform: translateY(-5px); opacity: 1; }
+  }
 
-        /* Typing indicator - Futuristic */
-        .typing {
-            display: none;
-            align-items: center;
-            gap: 16px;
-            padding-left: 20px;
-        }
+  /* ── INPUT AREA ─────────────────────────────────────── */
+  .input-area {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 16px 40px 24px;
+    background: linear-gradient(180deg, transparent, rgba(2,3,10,0.95) 35%);
+    pointer-events: none;
+  }
 
-        .typing-dot {
-            animation: typingBounce 1.2s infinite;
-        }
+  /* Image preview in input */
+  #image-preview-bar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    pointer-events: all;
+  }
+  #image-preview-thumb {
+    width: 48px; height: 48px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  #image-preview-name {
+    font-size: 12px;
+    color: var(--pulsar);
+    flex: 1;
+  }
+  #remove-image-btn {
+    background: none; border: none;
+    color: rgba(232,240,255,0.5);
+    cursor: pointer; font-size: 16px;
+    transition: color 0.2s;
+  }
+  #remove-image-btn:hover { color: #f44336; }
 
-        @keyframes typingBounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-6px); }
-        }
+  .input-box {
+    background: rgba(13,18,48,0.95);
+    border: 1px solid rgba(79,195,247,0.3);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    box-shadow: 0 0 30px rgba(79,195,247,0.1);
+    pointer-events: all;
+  }
 
-        /* History items */
-        .history-item {
-            border-radius: 16px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 9px;
+    background: rgba(79,195,247,0.08);
+    border: 1px solid var(--border);
+    color: var(--dim);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 16px; flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .icon-btn:hover { background: rgba(79,195,247,0.15); color: var(--pulsar); }
 
-        .history-item.active {
-            background: rgba(0, 245, 255, 0.1);
-            border: 1px solid rgba(0, 245, 255, 0.4);
-            box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
-        }
-    </style>
+  #msg {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--star);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 14.5px;
+    resize: none;
+    max-height: 120px;
+    line-height: 1.5;
+    padding: 8px 4px;
+  }
+  #msg::placeholder { color: rgba(232,240,255,0.3); }
+
+  .send-btn {
+    width: 42px; height: 42px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--nova), var(--pulsar));
+    border: none;
+    color: white;
+    font-size: 17px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.25s;
+    flex-shrink: 0;
+    box-shadow: 0 0 15px rgba(124,77,255,0.4);
+  }
+  .send-btn:hover { transform: scale(1.08); box-shadow: 0 0 25px rgba(124,77,255,0.6); }
+  .send-btn:active { transform: scale(0.95); }
+
+  .input-hint {
+    text-align: center;
+    font-size: 9.5px;
+    color: rgba(232,240,255,0.2);
+    letter-spacing: 2px;
+    margin-top: 10px;
+    pointer-events: none;
+  }
+
+  /* Rate limit banner */
+  #rate-limit-banner {
+    display: none;
+    background: rgba(255,109,0,0.12);
+    border: 1px solid rgba(255,109,0,0.3);
+    border-radius: 8px;
+    color: #ff9100;
+    font-size: 12px;
+    padding: 8px 16px;
+    text-align: center;
+    margin-bottom: 8px;
+    pointer-events: all;
+  }
+
+  /* Welcome screen */
+  .welcome {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding-bottom: 100px;
+  }
+  .welcome-icon { font-size: 64px; }
+  .welcome h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    background: linear-gradient(90deg, var(--aurora), var(--nova));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .welcome p {
+    color: var(--dim);
+    font-size: 14px;
+    text-align: center;
+    max-width: 400px;
+    line-height: 1.7;
+  }
+  .welcome-chips {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    max-width: 500px;
+    margin-top: 8px;
+  }
+  .chip {
+    background: rgba(79,195,247,0.08);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--pulsar);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .chip:hover {
+    background: rgba(79,195,247,0.18);
+    border-color: var(--pulsar);
+    transform: translateY(-2px);
+  }
+
+  #file-input { display: none; }
+</style>
 </head>
+<body>
+<div class="stars"></div>
 
-<body class="bg-black text-white">
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🌌</div>
+    <h1>COSMOS</h1>
+    <p>SPACE EXPLORER AI · v3.0</p>
+  </div>
 
-    <div class="app-container">
-        <!-- SIDEBAR -->
-        <div class="sidebar">
-            <!-- Logo -->
-            <div class="px-6 pt-8 pb-6 flex items-center gap-x-3 border-b border-white/10">
-                <div class="avatar bg-gradient-to-br from-[#00f5ff] to-[#0099ff] shadow-[0_0_25px_-5px_#00f5ff]">
-                    <i class="fas fa-brain text-2xl"></i>
-                </div>
-                <div class="title-font text-3xl tracking-[-2px]">NEXUS</div>
-                <div class="px-3 py-px text-xs font-bold bg-white/10 text-[#00f5ff] rounded-3xl tracking-[1px] mt-1">AI</div>
-            </div>
+  <button class="new-chat-btn" onclick="startNewChat()">
+    <span>+</span>
+    NEW MISSION
+  </button>
 
-            <!-- New Chat Button -->
-            <div onclick="startNewChat()" 
-                 class="new-chat-btn mx-4 mt-8 flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-[#00f5ff]/30 hover:border-[#00f5ff] text-[#00f5ff] font-semibold py-5 px-6 rounded-3xl text-sm tracking-[0.5px] uppercase">
-                <i class="fas fa-plus text-lg"></i>
-                <span>NEW CONVERSATION</span>
-            </div>
+  <div class="history-label">RECENT MISSIONS</div>
+  <div class="history-list" id="history-list"></div>
 
-            <!-- History -->
-            <div class="flex-1 overflow-y-auto px-4 mt-6">
-                <div class="text-xs font-medium text-white/40 px-4 mb-4 tracking-widest">RECENT SESSIONS</div>
-                <div id="chat-history-list" class="flex flex-col gap-2 px-2">
-                </div>
-            </div>
-
-            <!-- Session footer -->
-            <div class="mt-auto p-6 border-t border-white/10 text-xs font-mono flex items-center justify-between text-white/50">
-                <div>SESSION <span id="session-display" class="text-[#00f5ff]"></span></div>
-                <div class="flex items-center gap-1.5">
-                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                    ONLINE
-                </div>
-            </div>
-        </div>
-
-        <!-- MAIN CHAT AREA -->
-        <div class="chat-main flex-1 flex flex-col relative">
-            
-            <!-- Top Bar -->
-            <div class="h-16 bg-white/5 backdrop-blur-xl border-b border-white/10 px-10 flex items-center justify-between z-10">
-                <div class="flex items-center gap-x-4">
-                    <div class="avatar bg-gradient-to-br from-[#00f5ff] to-[#0099ff] text-xl">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div>
-                        <h1 class="title-font text-2xl tracking-[-1px]">AI Assistant</h1>
-                        <p class="text-xs text-[#00f5ff]/70 font-medium -mt-1">NEURAL • FUTURISTIC • v2.4</p>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-8 text-sm">
-                    <div id="header-session-display" class="font-mono text-[#00f5ff]/80"></div>
-                    <button onclick="startNewChat()" 
-                            class="flex items-center gap-2 text-white/70 hover:text-[#00f5ff]">
-                        <i class="fas fa-arrows-rotate"></i>
-                        <span class="font-medium">RESET THREAD</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Messages -->
-            <div id="chat-window"></div>
-
-            <!-- Input Area -->
-            <div class="input-container">
-                <div id="typing-indicator" class="typing">
-                    <div class="avatar bg-gradient-to-br from-[#00f5ff] to-[#0099ff]">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <div class="typing-dot w-3 h-3 bg-[#00f5ff] rounded-full" style="animation-delay: 0ms"></div>
-                        <div class="typing-dot w-3 h-3 bg-[#00f5ff] rounded-full" style="animation-delay: 150ms"></div>
-                        <div class="typing-dot w-3 h-3 bg-[#00f5ff] rounded-full" style="animation-delay: 300ms"></div>
-                    </div>
-                    <span class="text-white/50 text-sm font-medium ml-2">NEXUS is synthesizing response...</span>
-                </div>
-
-                <div class="input-wrapper flex items-center">
-                    
-                    <input 
-                        type="text" 
-                        id="msg" 
-                        placeholder="Describe the future... or ask anything" 
-                        autocomplete="off"
-                        class="flex-1 px-8 outline-none placeholder:text-white/40 text-white text-[17px]">
-                    <button onclick="send()" class="send-btn">
-                        <i class="fas fa-paper-plane text-xl"></i>
-                    </button>
-                </div>
-
-                <div class="text-center text-[10px] text-white/30 mt-4 tracking-widest font-medium">
-                    SECURE • PRIVATE • POWERED BY NEXT-GEN NEURAL ARCHITECTURE
-                </div>
-            </div>
-        </div>
+  <div class="sidebar-footer">
+    <div style="font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1px;">
+      SESSION · <span id="session-footer" style="color:var(--aurora)"></span>
     </div>
+    <div class="online-dot">
+      <div class="pulse"></div>
+      <span style="font-size:9px;letter-spacing:1px;">ONLINE</span>
+    </div>
+  </div>
+</div>
 
-    <script>
-        // Tailwind initialization for extra utilities
-        tailwind.config = {
-            content: [],
-            theme: {
-                extend: {}
-            }
-        };
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-avatar">🔭</div>
+      <div>
+        <div class="topbar-title">COSMOS AI</div>
+        <div class="topbar-sub">NEURAL SPACE INTELLIGENCE</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-session" id="session-topbar"></div>
+      <button class="reset-btn" onclick="startNewChat()">⟳ RESET</button>
+    </div>
+  </div>
 
-        const chatWindow = document.getElementById("chat-window");
-        const msgInput = document.getElementById("msg");
-        const historyList = document.getElementById("chat-history-list");
-        const sessionDisplay = document.getElementById("session-display");
-        const headerSessionDisplay = document.getElementById("header-session-display");
+  <div id="chat-window">
+    <!-- Welcome screen -->
+    <div class="welcome" id="welcome-screen">
+      <div class="welcome-icon">🌠</div>
+      <h2>EXPLORE THE COSMOS</h2>
+      <p>Your AI guide to the universe. Ask me anything about black holes, exoplanets, missions, or the fundamental laws of spacetime. You can even upload images of celestial objects for analysis.</p>
+      <div class="welcome-chips">
+        <div class="chip" onclick="sendChip('What is a neutron star?')">🌟 Neutron Stars</div>
+        <div class="chip" onclick="sendChip('How do black holes form?')">🕳️ Black Holes</div>
+        <div class="chip" onclick="sendChip('Tell me about the James Webb Space Telescope')">🔭 James Webb</div>
+        <div class="chip" onclick="sendChip('What is dark matter?')">🌑 Dark Matter</div>
+        <div class="chip" onclick="sendChip('How many exoplanets have we discovered?')">🪐 Exoplanets</div>
+        <div class="chip" onclick="sendChip('Explain the Big Bang theory')">💥 Big Bang</div>
+      </div>
+    </div>
+    <div id="typing-indicator" class="msg-row">
+      <div class="msg-avatar ai-avatar">🤖</div>
+      <div class="typing-dots">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+  </div>
 
-        let sessions = JSON.parse(localStorage.getItem("chat_sessions")) || [];
-        let currentSessionId = localStorage.getItem("active_session");
 
-        function init() {
-            if (!currentSessionId) {
-                startNewChat();
-            } else {
-                sessionDisplay.innerText = currentSessionId;
-                headerSessionDisplay.innerText = currentSessionId;
-                renderHistoryList();
-            }
-        }
+  <div class="input-area">
+    <div id="rate-limit-banner">⚠ Too many transmissions. Please wait before sending again.</div>
+    <div id="image-preview-bar">
+      <img id="image-preview-thumb" src="" alt="preview">
+      <span id="image-preview-name"></span>
+      <button id="remove-image-btn" onclick="removeImage()" title="Remove image">✕</button>
+    </div>
+    <div class="input-box">
+      <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
+      <button class="icon-btn" onclick="document.getElementById('file-input').click()" title="Upload celestial image">📎</button>
+      <textarea
+        id="msg"
+        rows="1"
+        placeholder="Transmit your question to COSMOS..."
+        oninput="autoResize(this)"
+        onkeydown="handleKey(event)"
+      ></textarea>
+      <button class="send-btn" onclick="send()" title="Send message">➤</button>
+    </div>
+    <div class="input-hint">SECURE · PRIVATE · POWERED BY NEURAL SPACE INTELLIGENCE</div>
+  </div>
+</div>
 
-        function startNewChat() {
-            currentSessionId = "Chat_" + Math.floor(Math.random() * 10000);
-            sessions.unshift(currentSessionId);
-            if (sessions.length > 10) sessions.pop();
+<script>
+// ── CONFIG ───────────────────────────────────────────────────
+const SHARED_SECRET = "honey"; // Must match your .env SHARED_SECRET
+const MAX_RPM = 10;
+const CLIENT_RATE_WINDOW = 60000;
 
-            localStorage.setItem("chat_sessions", JSON.stringify(sessions));
-            localStorage.setItem("active_session", currentSessionId);
+// ── STATE ───────────────────────────────────────────────────
+let sessions = JSON.parse(localStorage.getItem("cosmos_sessions") || "[]");
+let currentSessionId = localStorage.getItem("cosmos_active") || null;
+let pendingImageData = null;
+let pendingImageName = null;
+let requestTimestamps = JSON.parse(localStorage.getItem("cosmos_ratedata") || "[]");
 
-            sessionDisplay.innerText = currentSessionId;
-            headerSessionDisplay.innerText = currentSessionId;
+// ── INIT ─────────────────────────────────────────────────────
+function init() {
+  if (!currentSessionId) {
+    startNewChat();
+  } else {
+    updateSessionUI();
+    renderHistory();
+  }
+}
 
-            chatWindow.innerHTML = `
-                <div class="message-wrapper justify-start">
-                    <div class="avatar bg-gradient-to-br from-[#00f5ff] to-[#0099ff]">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="ai-bubble">
-                        New conversation initialized.<br>
-                        I'm ready. What future shall we explore today?
-                    </div>
-                </div>
-            `;
-            renderHistoryList();
-        }
+function startNewChat() {
+  currentSessionId = "MISSION-" + Date.now().toString(36).toUpperCase();
+  sessions.unshift(currentSessionId);
+  if (sessions.length > 15) sessions.pop();
+  
+  localStorage.setItem("cosmos_sessions", JSON.stringify(sessions));
+  localStorage.setItem("cosmos_active", currentSessionId);
+  
+  updateSessionUI();
+  renderHistory();
+  clearChat();
+}
 
-        function switchSession(id) {
-            currentSessionId = id;
-            localStorage.setItem("active_session", id);
-            sessionDisplay.innerText = id;
-            headerSessionDisplay.innerText = id;
+function switchSession(id) {
+  currentSessionId = id;
+  localStorage.setItem("cosmos_active", id);
+  updateSessionUI();
+  renderHistory();
+  clearChat();
+  appendMessage("ai", `🛸 Resuming mission <strong style="color:var(--aurora)">${id}</strong>. Neural network synced. What shall we explore?`);
+}
 
-            chatWindow.innerHTML = `
-                <div class="message-wrapper justify-start">
-                    <div class="avatar bg-gradient-to-br from-[#00f5ff] to-[#0099ff]">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="ai-bubble">
-                        Welcome back to session <span class="font-mono">${id}</span>.<br>
-                        The neural network is fully synced. How can I assist?
-                    </div>
-                </div>
-            `;
-            renderHistoryList();
-        }
+function updateSessionUI() {
+  const short = currentSessionId.slice(-8);
+  document.getElementById("session-footer").textContent = short;
+  document.getElementById("session-topbar").textContent = short;
+}
 
-        function renderHistoryList() {
-            historyList.innerHTML = "";
-            sessions.forEach(id => {
-                const item = document.createElement("div");
-                item.className = `history-item flex items-center gap-3 px-5 py-4 text-sm cursor-pointer ${id === currentSessionId ? 'active' : 'hover:bg-white/5'}`;
-                item.innerHTML = `
-                    <i class="fas fa-comment-dots text-[#00f5ff]/70"></i>
-                    <span class="flex-1 truncate font-medium">${id}</span>
-                `;
-                item.onclick = () => switchSession(id);
-                historyList.appendChild(item);
-            });
-        }
+function renderHistory() {
+  const list = document.getElementById("history-list");
+  list.innerHTML = "";
+  sessions.forEach(id => {
+    const el = document.createElement("div");
+    el.className = `session-item ${id === currentSessionId ? "active" : ""}`;
+    el.innerHTML = `<div class="session-dot"></div><div class="session-name">${id}</div>`;
+    el.onclick = () => switchSession(id);
+    list.appendChild(el);
+  });
+}
 
-        async function send() {
-            let msg = msgInput.value.trim();
-            if (!msg) return;
+function clearChat() {
+  const cw = document.getElementById("chat-window");
+  cw.innerHTML = `
+    <div class="welcome" id="welcome-screen">
+      <div class="welcome-icon">🌠</div>
+      <h2>EXPLORE THE COSMOS</h2>
+      <p>Your AI guide to the universe. Ask me anything about black holes, exoplanets, missions, or the fundamental laws of spacetime. You can even upload images of celestial objects for analysis.</p>
+      <div class="welcome-chips">
+        <div class="chip" onclick="sendChip('What is a neutron star?')">🌟 Neutron Stars</div>
+        <div class="chip" onclick="sendChip('How do black holes form?')">🕳️ Black Holes</div>
+        <div class="chip" onclick="sendChip('Tell me about the James Webb Space Telescope')">🔭 James Webb</div>
+        <div class="chip" onclick="sendChip('What is dark matter?')">🌑 Dark Matter</div>
+        <div class="chip" onclick="sendChip('How many exoplanets have we discovered?')">🪐 Exoplanets</div>
+        <div class="chip" onclick="sendChip('Explain the Big Bang theory')">💥 Big Bang</div>
+      </div>
+    </div>
+  `;
+  pendingImageData = null;
+  pendingImageName = null;
+  document.getElementById("image-preview-bar").style.display = "none";
+}
 
-            appendMessage("user", msg);
-            msgInput.value = "";
-            const typingIndicator = document.getElementById("typing-indicator");
-            typingIndicator.style.display = "flex";
+// ── CLIENT SIDE RATE LIMITING ─────────────────────────────────
+function isClientRateLimited() {
+  const now = Date.now();
+  requestTimestamps = requestTimestamps.filter(t => now - t < CLIENT_RATE_WINDOW);
+  if (requestTimestamps.length >= MAX_RPM) return true;
+  requestTimestamps.push(now);
+  localStorage.setItem("cosmos_ratedata", JSON.stringify(requestTimestamps));
+  return false;
+}
 
-            try {
-                let res = await fetch("/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        message: msg,
-                        session_id: currentSessionId
-                    })
-                });
-                let data = await res.json();
-                typingIndicator.style.display = "none";
-                appendMessage("ai", data.response);
-            } catch (e) {
-                typingIndicator.style.display = "none";
-                appendMessage("ai", "Connection lost in the neural grid. Please try again.");
-            }
-        }
+// ── SEND ─────────────────────────────────────────────────────
+async function send() {
+  const textarea = document.getElementById("msg");
+  const msg = textarea.value.trim();
+  if (!msg) return;
 
-        function appendMessage(role, text) {
-            const wrapper = document.createElement("div");
-            wrapper.className = `message-wrapper ${role === "user" ? "justify-end" : "justify-start"}`;
+  if (isClientRateLimited()) {
+    showRateLimitBanner();
+    return;
+  }
 
-            if (role === "ai") {
-                wrapper.innerHTML = `
-                    <div class="avatar bg-gradient-to-br from-[#00f5ff] to-[#0099ff]">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="ai-bubble">${text}</div>
-                `;
-            } else {
-                wrapper.innerHTML = `
-                    <div class="user-bubble">${text}</div>
-                    <div class="avatar bg-gradient-to-br from-[#0099ff] to-[#0066cc]">
-                        <i class="fas fa-user"></i>
-                    </div>
-                `;
-            }
+  // Hide welcome screen if present
+  const ws = document.getElementById("welcome-screen");
+  if (ws) ws.remove();
 
-            chatWindow.appendChild(wrapper);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
+  const imageToSend = pendingImageData;
+  appendMessage("user", sanitizeInput(msg), pendingImageData);
+  
+  textarea.value = "";
+  autoResize(textarea);
+  removeImage();
 
-        // Keyboard support
-        msgInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") send();
-        });
+  // Show typing
+  showTyping();
 
-        init();
-    </script>
+  try {
+    const payload = {
+      message: msg,
+      session_id: currentSessionId
+    };
+    if (imageToSend) payload.image_data = imageToSend;
+
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Secret": SHARED_SECRET,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    hideTyping();
+
+    if (res.status === 429) {
+      showRateLimitBanner();
+      return;
+    }
+
+    if (data.error) {
+      appendMessage("ai", `⚠️ ${sanitizeInput(data.error)}`);
+    } else {
+      appendMessage("ai", formatResponse(data.response || data.message));
+    }
+  } catch (e) {
+    hideTyping();
+    appendMessage("ai", "⚠️ Signal lost. Check your connection and try again.");
+  }
+}
+
+function showRateLimitBanner() {
+  const banner = document.getElementById("rate-limit-banner");
+  banner.style.display = "block";
+  setTimeout(() => banner.style.display = "none", 6000);
+}
+
+// ── TYPING INDICATOR ─────────────────────────────────────────
+function showTyping() {
+  const typing = document.getElementById("typing-indicator");
+  typing.style.display = "flex";
+  document.getElementById("chat-window").scrollTop = 999999;
+}
+
+function hideTyping() {
+  const typing = document.getElementById("typing-indicator");
+  typing.style.display = "none";
+}
+
+// ── APPEND MESSAGE (FIXED) ───────────────────────────────────
+function appendMessage(role, text, imageData = null) {
+  const cw = document.getElementById("chat-window");
+  
+  const row = document.createElement("div");
+  row.className = `msg-row ${role}`;
+
+  const avatarHTML = role === "ai" 
+    ? `<div class="msg-avatar ai-avatar">🤖</div>`
+    : `<div class="msg-avatar user-avatar">👨‍🚀</div>`;
+
+  const imgHTML = imageData 
+    ? `<img class="msg-image-preview" src="${imageData}" alt="uploaded image">` 
+    : "";
+
+  const bubbleHTML = role === "ai"
+    ? `<div class="msg-bubble ai-bubble">${text}</div>`
+    : `<div class="msg-bubble user-bubble">${imgHTML}${text}</div>`;
+
+  row.innerHTML = role === "ai" 
+    ? `${avatarHTML}${bubbleHTML}` 
+    : `${bubbleHTML}${avatarHTML}`;
+
+  // Safe insertion - always append to chat-window
+  cw.appendChild(row);
+  cw.scrollTop = cw.scrollHeight;
+}
+
+// ── UTILITIES ────────────────────────────────────────────────
+function sanitizeInput(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function formatResponse(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code style="background:rgba(79,195,247,0.1);padding:1px 5px;border-radius:4px;font-size:13px">$1</code>')
+    .replace(/\n/g, '<br>');
+}
+
+function sendChip(text) {
+  document.getElementById("msg").value = text;
+  send();
+}
+
+// ── FILE UPLOAD ───────────────────────────────────────────────
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("Only image files are supported.");
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    alert("Image too large. Max 5MB.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    pendingImageData = ev.target.result;
+    pendingImageName = file.name;
+
+    const bar = document.getElementById("image-preview-bar");
+    document.getElementById("image-preview-thumb").src = pendingImageData;
+    document.getElementById("image-preview-name").textContent = `📷 ${file.name}`;
+    bar.style.display = "flex";
+  };
+  reader.readAsDataURL(file);
+  e.target.value = "";
+}
+
+function removeImage() {
+  pendingImageData = null;
+  pendingImageName = null;
+  document.getElementById("image-preview-bar").style.display = "none";
+}
+
+function autoResize(el) {
+  el.style.height = "auto";
+  el.style.height = Math.min(el.scrollHeight, 120) + "px";
+}
+
+function handleKey(e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    send();
+  }
+}
+
+// Initialize
+init();
+</script>
 </body>
-
 </html>
