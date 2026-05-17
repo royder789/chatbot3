@@ -1,922 +1,1338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COSMOS — Space AI Explorer</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CULINA — AI Chef & Kitchen Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+
 <style>
-  :root {
-    --void: #02030a;
-    --deep: #060818;
-    --nebula: #0d1230;
-    --star: #e8f0ff;
-    --pulsar: #4fc3f7;
-    --nova: #7c4dff;
-    --supernova: #ff6d00;
-    --aurora: #00e5ff;
-    --dim: rgba(232,240,255,0.45);
-    --border: rgba(79,195,247,0.2);
-    --glow: rgba(79,195,247,0.12);
-  }
+/* ── DESIGN TOKENS ─────────────────────────────────── */
+:root {
+  --ember:    #e8621a;
+  --amber:    #f5a623;
+  --gold:     #d4a843;
+  --cream:    #fef9f0;
+  --parchment:#f5ead6;
+  --moss:     #2d4a2d;
+  --sage:     #4a7c59;
+  --pine:     #1a3323;
+  --ink:      #0f1a0f;
+  --charcoal: #1c2a1c;
+  --smoke:    #2a3a2a;
+  --mist:     rgba(255,255,255,0.06);
+  --glass:    rgba(255,255,255,0.04);
+  --border:   rgba(212,168,67,0.2);
+  --border-hi: rgba(232,98,26,0.4);
+  --text:     #e8dcc8;
+  --dim:      rgba(232,220,200,0.5);
+  --dimmer:   rgba(232,220,200,0.3);
+  --shadow:   0 8px 32px rgba(0,0,0,0.4);
+  --glow-ember: 0 0 20px rgba(232,98,26,0.3);
+  --glow-gold:  0 0 20px rgba(212,168,67,0.2);
+  --sidebar-w: 288px;
+  --radius:    14px;
+  --radius-sm: 8px;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--ink);
+  color: var(--text);
+  display: flex;
+}
 
-  body {
-    font-family: 'Exo 2', sans-serif;
-    background: var(--void);
-    color: var(--star);
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-  }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 
-  /* Starfield background */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background:
-      radial-gradient(ellipse at 20% 50%, rgba(124,77,255,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 20%, rgba(0,229,255,0.06) 0%, transparent 50%),
-      radial-gradient(ellipse at 60% 80%, rgba(79,195,247,0.05) 0%, transparent 40%);
-    pointer-events: none;
-    z-index: 0;
-  }
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 50%, rgba(45,74,45,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 85% 20%, rgba(232,98,26,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 50% at 50% 100%, rgba(212,168,67,0.05) 0%, transparent 60%),
+    var(--ink);
+}
 
-  /* Stars */
-  .stars {
-    position: fixed; inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-  .stars::before, .stars::after {
-    content: '';
-    position: absolute;
-    width: 2px; height: 2px;
-    border-radius: 50%;
-    background: transparent;
-    box-shadow:
-      120px 30px 0 rgba(232,240,255,0.7),
-      340px 80px 0 rgba(232,240,255,0.5),
-      580px 140px 0 rgba(232,240,255,0.8),
-      800px 200px 0 rgba(232,240,255,0.4),
-      1050px 60px 0 rgba(232,240,255,0.6),
-      1300px 160px 0 rgba(232,240,255,0.7),
-      200px 320px 0 rgba(232,240,255,0.5),
-      450px 400px 0 rgba(232,240,255,0.3),
-      700px 280px 0 rgba(232,240,255,0.6),
-      950px 380px 0 rgba(232,240,255,0.8),
-      1150px 320px 0 rgba(232,240,255,0.4),
-      80px 500px 0 rgba(232,240,255,0.5),
-      380px 560px 0 rgba(232,240,255,0.7),
-      620px 480px 0 rgba(232,240,255,0.3),
-      880px 530px 0 rgba(232,240,255,0.6),
-      1200px 470px 0 rgba(232,240,255,0.5),
-      1400px 40px 0 rgba(79,195,247,0.8),
-      1460px 340px 0 rgba(124,77,255,0.7),
-      30px 700px 0 rgba(232,240,255,0.4),
-      260px 720px 0 rgba(232,240,255,0.6),
-      500px 680px 0 rgba(232,240,255,0.5),
-      760px 740px 0 rgba(232,240,255,0.7);
-    animation: twinkle 4s infinite alternate;
-  }
-  .stars::after {
-    box-shadow:
-      160px 110px 0 rgba(232,240,255,0.6),
-      400px 40px 0 rgba(232,240,255,0.4),
-      640px 200px 0 rgba(232,240,255,0.7),
-      900px 130px 0 rgba(232,240,255,0.5),
-      1100px 90px 0 rgba(232,240,255,0.8),
-      300px 440px 0 rgba(79,195,247,0.5),
-      550px 360px 0 rgba(232,240,255,0.4),
-      820px 460px 0 rgba(232,240,255,0.6),
-      1000px 290px 0 rgba(232,240,255,0.7),
-      1350px 200px 0 rgba(232,240,255,0.5),
-      50px 600px 0 rgba(232,240,255,0.4),
-      340px 650px 0 rgba(124,77,255,0.6),
-      680px 600px 0 rgba(232,240,255,0.5),
-      1100px 580px 0 rgba(232,240,255,0.7);
-    animation-duration: 6s;
-    animation-delay: -2s;
-  }
-  @keyframes twinkle {
-    0% { opacity: 0.4; }
-    100% { opacity: 1; }
-  }
+/* ── SIDEBAR ───────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  height: 100vh;
+  background: rgba(10,20,10,0.97);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+}
 
-  /* ── SIDEBAR ─────────────────────────────────────────── */
-  .sidebar {
-    width: 270px;
-    min-width: 270px;
-    background: rgba(6,8,24,0.92);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    z-index: 10;
-    backdrop-filter: blur(20px);
-  }
+.sidebar-logo {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.logo-mark { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.logo-icon {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--ember), var(--amber));
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  box-shadow: var(--glow-ember);
+  flex-shrink: 0;
+}
+.logo-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 21px; font-weight: 700; letter-spacing: 3px;
+  background: linear-gradient(135deg, var(--amber), var(--ember));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.logo-sub {
+  font-size: 9px; color: var(--dimmer); letter-spacing: 2px;
+  text-transform: uppercase; padding-left: 52px; margin-top: -2px;
+}
 
-  .logo {
-    padding: 28px 24px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-  .logo-icon {
-    width: 48px; height: 48px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--nova), var(--pulsar));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
-    margin-bottom: 12px;
-    box-shadow: 0 0 20px rgba(124,77,255,0.4);
-  }
-  .logo h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 22px;
-    font-weight: 900;
-    letter-spacing: 4px;
-    background: linear-gradient(90deg, var(--aurora), var(--nova));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .logo p {
-    font-size: 10px;
-    color: var(--dim);
-    letter-spacing: 2px;
-    margin-top: 2px;
-  }
+.new-kitchen-btn {
+  margin: 12px 14px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, var(--ember), #c8511a);
+  border: none; border-radius: var(--radius-sm);
+  color: #fff; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 600; letter-spacing: 1px;
+  cursor: pointer; display: flex; align-items: center; gap: 8px;
+  transition: all 0.2s; box-shadow: var(--glow-ember);
+  flex-shrink: 0;
+}
+.new-kitchen-btn:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(232,98,26,0.5); }
 
-  .new-chat-btn {
-    margin: 16px;
-    padding: 12px 16px;
-    background: linear-gradient(135deg, rgba(79,195,247,0.1), rgba(124,77,255,0.1));
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--aurora);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 11px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .new-chat-btn:hover {
-    background: linear-gradient(135deg, rgba(79,195,247,0.2), rgba(124,77,255,0.2));
-    box-shadow: 0 0 20px rgba(79,195,247,0.2);
-    transform: translateY(-1px);
-  }
-  .new-chat-btn span { font-size: 18px; }
+.sidebar-section-title {
+  padding: 10px 18px 5px;
+  font-size: 9px; letter-spacing: 2.5px;
+  color: var(--dimmer); text-transform: uppercase; flex-shrink: 0;
+}
 
-  .history-label {
-    padding: 12px 20px 6px;
-    font-size: 9px;
-    letter-spacing: 3px;
-    color: rgba(232,240,255,0.3);
-    font-family: 'Orbitron', sans-serif;
-  }
+.sessions-list { flex: 1; overflow-y: auto; padding: 3px 8px; min-height: 0; }
 
-  .history-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0 12px;
-  }
-  .history-list::-webkit-scrollbar { width: 3px; }
-  .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.session-item {
+  padding: 9px 12px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.15s;
+  margin-bottom: 2px; display: flex; align-items: center; gap: 8px;
+  border: 1px solid transparent;
+}
+.session-item:hover { background: var(--mist); border-color: var(--border); }
+.session-item.active { background: rgba(232,98,26,0.12); border-color: rgba(232,98,26,0.3); }
+.session-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--dimmer); flex-shrink: 0;
+}
+.session-item.active .session-dot { background: var(--ember); box-shadow: var(--glow-ember); }
+.session-name {
+  font-size: 12px; color: var(--dim);
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1;
+}
+.session-item.active .session-name { color: var(--text); }
+.session-del {
+  background: none; border: none; color: var(--dimmer);
+  cursor: pointer; font-size: 14px; padding: 2px 4px;
+  border-radius: 4px; opacity: 0; transition: opacity 0.15s;
+}
+.session-item:hover .session-del { opacity: 1; }
+.session-del:hover { color: #ef5350; }
 
-  .session-item {
-    padding: 10px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 12px;
-    color: var(--dim);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.2s;
-    margin-bottom: 2px;
-  }
-  .session-item:hover { background: var(--glow); color: var(--star); }
-  .session-item.active {
-    background: linear-gradient(135deg, rgba(79,195,247,0.15), rgba(124,77,255,0.1));
-    border: 1px solid rgba(79,195,247,0.3);
-    color: var(--aurora);
-  }
-  .session-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--nova); flex-shrink: 0; }
-  .session-item.active .session-dot { background: var(--aurora); box-shadow: 0 0 6px var(--aurora); }
-  .session-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* ── SIDEBAR BOTTOM TABS ───────────────────────────── */
+.sidebar-bottom {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+}
+.sidebar-tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-tab {
+  flex: 1; padding: 10px 8px;
+  font-size: 10px; letter-spacing: 1px;
+  color: var(--dimmer); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  text-align: center; text-transform: uppercase;
+  transition: all 0.15s; user-select: none;
+}
+.sidebar-tab.active { color: var(--amber); border-bottom-color: var(--amber); }
+.sidebar-tab:hover:not(.active) { color: var(--dim); }
 
-  .sidebar-footer {
-    padding: 16px 20px;
-    border-top: 1px solid var(--border);
-    font-size: 10px;
-    color: rgba(232,240,255,0.3);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .online-dot {
-    display: flex; align-items: center; gap: 6px;
-  }
-  .pulse {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #00e676;
-    animation: pulse-anim 2s infinite;
-  }
-  @keyframes pulse-anim {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(0,230,118,0.4); }
-    50% { box-shadow: 0 0 0 5px rgba(0,230,118,0); }
-  }
+.sidebar-panel { display: none; }
+.sidebar-panel.active { display: block; }
 
-  /* ── MAIN AREA ───────────────────────────────────────── */
-  .main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    z-index: 5;
-    overflow: hidden;
-  }
+/* ── PROFILE PANEL ─────────────────────────────────── */
+.sidebar-profile { padding: 14px 16px; }
+.profile-label {
+  font-size: 9px; letter-spacing: 2px;
+  color: var(--dimmer); text-transform: uppercase; margin-bottom: 8px;
+}
+.dietary-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+.dietary-chip {
+  padding: 3px 8px; border-radius: 99px; font-size: 10px;
+  border: 1px solid var(--border); color: var(--dimmer);
+  cursor: pointer; transition: all 0.15s; user-select: none;
+}
+.dietary-chip.active {
+  background: rgba(74,124,89,0.3); border-color: var(--sage); color: #8fc99e;
+}
+.skill-select {
+  width: 100%; background: var(--glass);
+  border: 1px solid var(--border); border-radius: 6px;
+  color: var(--dim); font-size: 11px; padding: 5px 10px;
+  font-family: 'DM Sans', sans-serif; cursor: pointer;
+}
+.skill-select:focus { outline: none; border-color: var(--gold); }
 
-  .topbar {
-    height: 64px;
-    background: rgba(6,8,24,0.7);
-    border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(20px);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 28px;
-    flex-shrink: 0;
-  }
-  .topbar-left {
-    display: flex; align-items: center; gap: 14px;
-  }
-  .topbar-avatar {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--nova), var(--pulsar));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    box-shadow: 0 0 15px rgba(124,77,255,0.3);
-  }
-  .topbar-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: var(--star);
-  }
-  .topbar-sub {
-    font-size: 10px;
-    color: var(--pulsar);
-    letter-spacing: 2px;
-  }
-  .topbar-right {
-    display: flex; align-items: center; gap: 20px;
-  }
-  .topbar-session {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
-    color: rgba(79,195,247,0.6);
-    letter-spacing: 1px;
-  }
-  .reset-btn {
-    background: none; border: 1px solid var(--border);
-    color: var(--dim); padding: 6px 14px; border-radius: 6px;
-    font-size: 11px; letter-spacing: 1px; cursor: pointer;
-    font-family: 'Orbitron', sans-serif;
-    transition: all 0.2s;
-  }
-  .reset-btn:hover { border-color: var(--pulsar); color: var(--pulsar); }
+/* ── PANTRY PANEL ──────────────────────────────────── */
+.pantry-panel { padding: 14px 16px; }
+.pantry-input-row { display: flex; gap: 6px; margin-bottom: 10px; }
+.pantry-input {
+  flex: 1; background: var(--glass);
+  border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); font-size: 12px; padding: 6px 10px;
+  font-family: 'DM Sans', sans-serif;
+}
+.pantry-input::placeholder { color: var(--dimmer); }
+.pantry-input:focus { outline: none; border-color: var(--amber); }
+.pantry-add-btn {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, var(--ember), #c8511a);
+  border: none; border-radius: 6px; color: #fff;
+  font-size: 18px; cursor: pointer; transition: all 0.15s;
+}
+.pantry-add-btn:hover { box-shadow: var(--glow-ember); }
+.pantry-chips { display: flex; flex-wrap: wrap; gap: 5px; max-height: 140px; overflow-y: auto; }
+.pantry-chip {
+  display: flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 99px; font-size: 11px;
+  background: rgba(74,124,89,0.2); border: 1px solid rgba(74,124,89,0.35);
+  color: #8fc99e;
+}
+.pantry-chip-del {
+  background: none; border: none; color: rgba(239,83,80,0.7);
+  cursor: pointer; font-size: 13px; padding: 0; line-height: 1;
+}
+.pantry-chip-del:hover { color: #ef5350; }
+.pantry-empty { font-size: 11px; color: var(--dimmer); text-align: center; padding: 12px; }
+.pantry-suggest-btn {
+  width: 100%; margin-top: 10px;
+  padding: 8px; font-size: 11px;
+  background: rgba(74,124,89,0.15); border: 1px solid rgba(74,124,89,0.3);
+  border-radius: 6px; color: var(--sage); cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+}
+.pantry-suggest-btn:hover { background: rgba(74,124,89,0.25); }
 
-  /* ── CHAT WINDOW ─────────────────────────────────────── */
-  #chat-window {
-    flex: 1;
-    overflow-y: auto;
-    padding: 32px 40px 140px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-  #chat-window::-webkit-scrollbar { width: 4px; }
-  #chat-window::-webkit-scrollbar-thumb {
-    background: linear-gradient(var(--pulsar), var(--nova));
-    border-radius: 4px;
-  }
+/* ── MAIN ──────────────────────────────────────────── */
+.main {
+  flex: 1; display: flex; flex-direction: column;
+  height: 100vh; overflow: hidden; min-width: 0;
+}
 
-  /* ── MESSAGES ─────────────────────────────────────────── */
-  .msg-row {
-    display: flex;
-    gap: 14px;
-    animation: floatIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  @keyframes floatIn {
-    from { opacity: 0; transform: translateY(16px) scale(0.97); }
-    to { opacity: 1; transform: none; }
-  }
-  .msg-row.user { flex-direction: row-reverse; }
+/* ── TOPBAR ─────────────────────────────────────────── */
+.topbar {
+  height: 60px; min-height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(12,22,12,0.7); backdrop-filter: blur(20px); z-index: 10;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-kitchen {
+  font-family: 'Playfair Display', serif; font-size: 15px; color: var(--text);
+}
+.topbar-intent {
+  font-size: 10px; letter-spacing: 2px; color: var(--amber);
+  text-transform: uppercase; padding: 3px 10px;
+  border-radius: 99px; border: 1px solid rgba(245,166,35,0.3);
+  background: rgba(245,166,35,0.08); display: none;
+}
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.btn-icon {
+  width: 34px; height: 34px; border-radius: var(--radius-sm);
+  background: var(--glass); border: 1px solid var(--border);
+  color: var(--dim); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 15px; transition: all 0.15s;
+}
+.btn-icon:hover { border-color: var(--gold); color: var(--gold); }
+.status-dot {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: var(--dimmer); letter-spacing: 1px;
+}
+.status-dot::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: #4caf50; box-shadow: 0 0 8px rgba(76,175,80,0.8);
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:.4; } }
 
-  .msg-avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; flex-shrink: 0;
-  }
-  .ai-avatar {
-    background: linear-gradient(135deg, var(--nova), var(--pulsar));
-    box-shadow: 0 0 12px rgba(124,77,255,0.4);
-  }
-  .user-avatar {
-    background: linear-gradient(135deg, #1565c0, #0d47a1);
-    box-shadow: 0 0 12px rgba(21,101,192,0.4);
-  }
+/* ── TAB BAR ────────────────────────────────────────── */
+.tab-bar {
+  display: flex; gap: 4px; padding: 0 28px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(12,22,12,0.6); flex-shrink: 0;
+}
+.tab {
+  padding: 11px 16px; font-size: 11px; letter-spacing: 1px;
+  color: var(--dimmer); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s; text-transform: uppercase; user-select: none;
+}
+.tab:hover { color: var(--dim); }
+.tab.active { color: var(--amber); border-bottom-color: var(--amber); }
 
-  .msg-bubble {
-    max-width: 68%;
-    padding: 14px 20px;
-    border-radius: 18px;
-    font-size: 14.5px;
-    line-height: 1.65;
-  }
-  .ai-bubble {
-    background: rgba(13,18,48,0.9);
-    border: 1px solid rgba(79,195,247,0.2);
-    border-radius: 4px 18px 18px 18px;
-    color: var(--star);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-  }
-  .user-bubble {
-    background: linear-gradient(135deg, rgba(79,195,247,0.15), rgba(124,77,255,0.2));
-    border: 1px solid rgba(79,195,247,0.3);
-    border-radius: 18px 4px 18px 18px;
-    color: var(--star);
-  }
+/* ── CHAT AREA ──────────────────────────────────────── */
+#chat-window {
+  flex: 1; overflow-y: auto;
+  padding: 28px 36px 170px;
+  display: flex; flex-direction: column; gap: 24px;
+}
 
-  .msg-image-preview {
-    max-width: 200px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    margin-bottom: 8px;
-    display: block;
-  }
+/* ── WELCOME ────────────────────────────────────────── */
+.welcome {
+  margin: auto; text-align: center; max-width: 560px;
+  padding: 48px 24px; animation: floatIn 0.6s ease;
+}
+.welcome-flame {
+  font-size: 68px; margin-bottom: 20px; display: block;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
+.welcome h1 {
+  font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 700;
+  background: linear-gradient(135deg, var(--cream), var(--amber));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 10px; line-height: 1.2;
+}
+.welcome p { font-size: 14px; color: var(--dim); line-height: 1.7; margin-bottom: 28px; }
+.welcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; text-align: left; }
+.welcome-card {
+  padding: 14px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--glass);
+  cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px);
+}
+.welcome-card:hover {
+  border-color: var(--ember); background: rgba(232,98,26,0.08);
+  transform: translateY(-2px);
+}
+.welcome-card-icon { font-size: 22px; margin-bottom: 7px; display: block; }
+.welcome-card-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.welcome-card-sub { font-size: 10px; color: var(--dimmer); }
 
-  /* ── TYPING INDICATOR ─────────────────────────────────── */
-  #typing-indicator {
-    display: none;
-    align-items: center;
-    gap: 14px;
-    padding-left: 4px;
-  }
-  .typing-dots {
-    display: flex; gap: 5px;
-    background: rgba(13,18,48,0.9);
-    border: 1px solid rgba(79,195,247,0.2);
-    border-radius: 18px;
-    padding: 14px 18px;
-  }
-  .typing-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--pulsar);
-    animation: bounce 1.2s infinite;
-  }
-  .typing-dot:nth-child(2) { animation-delay: 0.15s; }
-  .typing-dot:nth-child(3) { animation-delay: 0.3s; }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); opacity: 0.5; }
-    50% { transform: translateY(-5px); opacity: 1; }
-  }
+/* ── MESSAGES ───────────────────────────────────────── */
+@keyframes floatIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
 
-  /* ── INPUT AREA ─────────────────────────────────────── */
-  .input-area {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    padding: 16px 40px 24px;
-    background: linear-gradient(180deg, transparent, rgba(2,3,10,0.95) 35%);
-    pointer-events: none;
-  }
+.msg-row {
+  display: flex; gap: 12px;
+  animation: floatIn 0.35s ease; max-width: 800px;
+}
+.msg-row.user { flex-direction: row-reverse; align-self: flex-end; }
+.msg-row.ai   { align-self: flex-start; }
 
-  /* Image preview in input */
-  #image-preview-bar {
-    display: none;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    pointer-events: all;
-  }
-  #image-preview-thumb {
-    width: 48px; height: 48px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-  }
-  #image-preview-name {
-    font-size: 12px;
-    color: var(--pulsar);
-    flex: 1;
-  }
-  #remove-image-btn {
-    background: none; border: none;
-    color: rgba(232,240,255,0.5);
-    cursor: pointer; font-size: 16px;
-    transition: color 0.2s;
-  }
-  #remove-image-btn:hover { color: #f44336; }
+.msg-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+.ai-avatar { background: linear-gradient(135deg, var(--ember), var(--amber)); box-shadow: var(--glow-ember); }
+.user-avatar { background: linear-gradient(135deg, var(--moss), var(--sage)); }
 
-  .input-box {
-    background: rgba(13,18,48,0.95);
-    border: 1px solid rgba(79,195,247,0.3);
-    border-radius: 14px;
-    padding: 12px 14px;
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    box-shadow: 0 0 30px rgba(79,195,247,0.1);
-    pointer-events: all;
-  }
+.msg-bubble {
+  max-width: 640px; border-radius: 18px;
+  padding: 13px 18px; line-height: 1.7; font-size: 14px;
+}
+.ai-bubble {
+  background: rgba(20,34,20,0.85); border: 1px solid var(--border);
+  border-radius: 4px 18px 18px 18px; backdrop-filter: blur(12px);
+}
+.user-bubble {
+  background: linear-gradient(135deg, rgba(74,124,89,0.2), rgba(45,74,45,0.3));
+  border: 1px solid rgba(74,124,89,0.3); border-radius: 18px 4px 18px 18px;
+}
 
-  .icon-btn {
-    width: 38px; height: 38px; border-radius: 9px;
-    background: rgba(79,195,247,0.08);
-    border: 1px solid var(--border);
-    color: var(--dim);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 16px; flex-shrink: 0;
-    transition: all 0.2s;
-  }
-  .icon-btn:hover { background: rgba(79,195,247,0.15); color: var(--pulsar); }
+.ai-bubble h1,.ai-bubble h2,.ai-bubble h3 {
+  font-family: 'Playfair Display', serif; color: var(--amber); margin: 14px 0 7px; line-height: 1.3;
+}
+.ai-bubble h1 { font-size: 19px; } .ai-bubble h2 { font-size: 16px; } .ai-bubble h3 { font-size: 14px; }
+.ai-bubble p { margin: 7px 0; }
+.ai-bubble ul,.ai-bubble ol { padding-left: 18px; margin: 7px 0; }
+.ai-bubble li { margin: 4px 0; }
+.ai-bubble strong { color: var(--cream); }
+.ai-bubble em { color: var(--gold); }
+.ai-bubble code {
+  font-family: 'DM Mono', monospace; font-size: 12px;
+  background: rgba(0,0,0,0.3); padding: 1px 6px;
+  border-radius: 4px; color: var(--amber);
+}
+.ai-bubble hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
 
-  #msg {
-    flex: 1;
-    background: none;
-    border: none;
-    outline: none;
-    color: var(--star);
-    font-family: 'Exo 2', sans-serif;
-    font-size: 14.5px;
-    resize: none;
-    max-height: 120px;
-    line-height: 1.5;
-    padding: 8px 4px;
-  }
-  #msg::placeholder { color: rgba(232,240,255,0.3); }
+/* Recipe buttons row */
+.recipe-actions {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;
+}
+.save-recipe-btn {
+  padding: 6px 14px;
+  background: transparent; border: 1px solid var(--border-hi);
+  border-radius: 99px; color: var(--ember);
+  font-size: 11px; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+  transition: all 0.15s;
+}
+.save-recipe-btn:hover { background: rgba(232,98,26,0.1); border-color: var(--ember); }
+.save-recipe-btn.cooking {
+  color: var(--sage); border-color: rgba(74,124,89,0.4);
+}
+.save-recipe-btn.cooking:hover { background: rgba(74,124,89,0.1); }
 
-  .send-btn {
-    width: 42px; height: 42px; border-radius: 10px;
-    background: linear-gradient(135deg, var(--nova), var(--pulsar));
-    border: none;
-    color: white;
-    font-size: 17px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.25s;
-    flex-shrink: 0;
-    box-shadow: 0 0 15px rgba(124,77,255,0.4);
-  }
-  .send-btn:hover { transform: scale(1.08); box-shadow: 0 0 25px rgba(124,77,255,0.6); }
-  .send-btn:active { transform: scale(0.95); }
+.msg-image { max-width: 220px; border-radius: 10px; margin-bottom: 10px; display: block; border: 1px solid var(--border); }
 
-  .input-hint {
-    text-align: center;
-    font-size: 9.5px;
-    color: rgba(232,240,255,0.2);
-    letter-spacing: 2px;
-    margin-top: 10px;
-    pointer-events: none;
-  }
+/* ── TYPING ─────────────────────────────────────────── */
+#typing-indicator { display: none; align-items: center; gap: 12px; animation: floatIn 0.3s ease; }
+.typing-dots {
+  display: flex; gap: 5px; padding: 14px 18px;
+  background: rgba(20,34,20,0.85); border: 1px solid var(--border);
+  border-radius: 4px 18px 18px 18px; backdrop-filter: blur(12px);
+}
+.typing-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--ember); animation: typeBounce 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typeBounce { 0%,100% { transform:translateY(0);opacity:.4; } 50% { transform:translateY(-6px);opacity:1; } }
 
-  /* Rate limit banner */
-  #rate-limit-banner {
-    display: none;
-    background: rgba(255,109,0,0.12);
-    border: 1px solid rgba(255,109,0,0.3);
-    border-radius: 8px;
-    color: #ff9100;
-    font-size: 12px;
-    padding: 8px 16px;
-    text-align: center;
-    margin-bottom: 8px;
-    pointer-events: all;
-  }
+/* ── INPUT AREA ─────────────────────────────────────── */
+.input-area {
+  position: absolute; bottom: 0; left: var(--sidebar-w); right: 0;
+  padding: 14px 36px 22px;
+  background: linear-gradient(180deg, transparent, rgba(15,26,15,0.98) 28%);
+  backdrop-filter: blur(16px); z-index: 10;
+}
+.image-preview-bar {
+  display: none; align-items: center; gap: 10px; margin-bottom: 8px;
+  padding: 7px 11px; background: var(--glass);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+}
+.preview-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+.preview-name { font-size: 11px; color: var(--dim); flex: 1; }
+.remove-img-btn { background: none; border: none; color: var(--dimmer); cursor: pointer; font-size: 15px; transition: color 0.15s; }
+.remove-img-btn:hover { color: #ef5350; }
 
-  /* Welcome screen */
-  .welcome {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding-bottom: 100px;
-  }
-  .welcome-icon { font-size: 64px; }
-  .welcome h2 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 28px;
-    font-weight: 900;
-    letter-spacing: 4px;
-    background: linear-gradient(90deg, var(--aurora), var(--nova));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .welcome p {
-    color: var(--dim);
-    font-size: 14px;
-    text-align: center;
-    max-width: 400px;
-    line-height: 1.7;
-  }
-  .welcome-chips {
-    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
-    max-width: 500px;
-    margin-top: 8px;
-  }
-  .chip {
-    background: rgba(79,195,247,0.08);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 8px 16px;
-    font-size: 12px;
-    color: var(--pulsar);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .chip:hover {
-    background: rgba(79,195,247,0.18);
-    border-color: var(--pulsar);
-    transform: translateY(-2px);
-  }
+.input-box {
+  display: flex; align-items: flex-end; gap: 9px;
+  background: rgba(18,30,18,0.95); border: 1px solid var(--border);
+  border-radius: 15px; padding: 11px 13px;
+  box-shadow: 0 0 36px rgba(0,0,0,0.4), var(--glow-gold);
+  transition: border-color 0.2s;
+}
+.input-box:focus-within { border-color: rgba(212,168,67,0.5); }
 
-  #file-input { display: none; }
+.icon-btn {
+  width: 36px; height: 36px; background: var(--glass);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--dimmer); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 17px; flex-shrink: 0; transition: all 0.15s;
+}
+.icon-btn:hover { border-color: var(--amber); color: var(--amber); }
+
+#msg-input {
+  flex: 1; background: none; border: none; outline: none;
+  color: var(--text); font-family: 'DM Sans', sans-serif;
+  font-size: 14px; resize: none; line-height: 1.5;
+  max-height: 130px; min-height: 24px;
+}
+#msg-input::placeholder { color: var(--dimmer); }
+
+.send-btn {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--ember), #c8511a);
+  border: none; border-radius: 11px; color: #fff;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 17px; flex-shrink: 0; transition: all 0.2s; box-shadow: var(--glow-ember);
+}
+.send-btn:hover { transform: scale(1.05); box-shadow: 0 0 28px rgba(232,98,26,0.6); }
+.send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.input-hint {
+  text-align: center; font-size: 9px; color: var(--dimmer);
+  letter-spacing: 1.5px; margin-top: 8px; text-transform: uppercase;
+}
+#file-input { display: none; }
+
+/* ── RECIPES PANEL ──────────────────────────────────── */
+.recipes-panel {
+  display: none; flex-direction: column;
+  height: 100%; padding: 28px 36px; overflow-y: auto;
+}
+.panel-title {
+  font-family: 'Playfair Display', serif; font-size: 24px;
+  color: var(--cream); margin-bottom: 5px;
+}
+.panel-sub { font-size: 12px; color: var(--dim); margin-bottom: 20px; }
+
+/* Recipe filters bar */
+.recipes-toolbar {
+  display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;
+}
+.recipe-search-box {
+  flex: 1; min-width: 160px;
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 12px;
+  padding: 8px 14px; font-family: 'DM Sans', sans-serif;
+}
+.recipe-search-box::placeholder { color: var(--dimmer); }
+.recipe-search-box:focus { outline: none; border-color: var(--amber); }
+.fav-filter-btn {
+  padding: 8px 14px; font-size: 11px;
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--dim);
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s; white-space: nowrap;
+}
+.fav-filter-btn.active {
+  background: rgba(245,166,35,0.15); border-color: var(--amber); color: var(--amber);
+}
+
+.recipes-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;
+}
+.recipe-card {
+  padding: 18px; background: rgba(20,34,20,0.7);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  backdrop-filter: blur(10px); transition: all 0.2s; cursor: pointer; position: relative;
+}
+.recipe-card:hover { border-color: var(--ember); transform: translateY(-2px); box-shadow: var(--glow-ember); }
+.recipe-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.recipe-card-emoji { font-size: 28px; flex-shrink: 0; }
+.recipe-card-fav {
+  background: none; border: none; font-size: 18px;
+  cursor: pointer; transition: transform 0.15s; padding: 2px;
+  line-height: 1; flex-shrink: 0;
+}
+.recipe-card-fav:hover { transform: scale(1.2); }
+.recipe-card-title {
+  font-family: 'Playfair Display', serif; font-size: 15px;
+  color: var(--cream); margin-bottom: 4px; line-height: 1.3;
+}
+.recipe-card-date { font-size: 10px; color: var(--dimmer); }
+.recipe-card-preview {
+  font-size: 12px; color: var(--dim); line-height: 1.5; margin-top: 8px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.recipe-card-footer {
+  display: flex; gap: 6px; margin-top: 12px;
+}
+.card-btn {
+  flex: 1; padding: 6px;
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--dimmer); font-size: 10px;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s; text-align: center;
+}
+.card-btn:hover { border-color: var(--amber); color: var(--amber); }
+.card-btn.danger:hover { border-color: #ef5350; color: #ef5350; }
+
+/* ── COOKING MODAL ──────────────────────────────────── */
+.cooking-modal {
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+  align-items: center; justify-content: center; animation: fadeIn 0.3s ease;
+}
+.cooking-modal.active { display: flex; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+.cooking-card {
+  background: var(--charcoal); border: 1px solid var(--border);
+  border-radius: 20px; padding: 32px; max-width: 520px; width: 90%;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+}
+.cooking-step-num {
+  font-size: 10px; letter-spacing: 3px; color: var(--ember);
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.cooking-step-text {
+  font-size: 17px; font-family: 'Playfair Display', serif;
+  color: var(--cream); line-height: 1.6; margin-bottom: 22px; min-height: 80px;
+}
+.cooking-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cook-btn {
+  padding: 9px 22px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--glass);
+  color: var(--dim); font-family: 'DM Sans', sans-serif; font-size: 12px;
+  cursor: pointer; transition: all 0.15s;
+}
+.cook-btn.primary {
+  background: linear-gradient(135deg, var(--ember), #c8511a);
+  border-color: transparent; color: #fff;
+}
+.cook-btn:hover { border-color: var(--amber); color: var(--amber); }
+.cook-btn.primary:hover { box-shadow: var(--glow-ember); }
+.cook-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.step-progress { font-size: 11px; color: var(--dim); letter-spacing: 1px; }
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(20,34,20,0.95); border: 1px solid var(--border);
+  border-radius: 10px; padding: 11px 20px;
+  font-size: 12px; color: var(--cream); opacity: 0;
+  pointer-events: none; transition: all 0.3s;
+  backdrop-filter: blur(12px); z-index: 999; white-space: nowrap;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.hidden { display: none !important; }
 </style>
 </head>
 <body>
-<div class="stars"></div>
 
-<div class="sidebar">
-  <div class="logo">
-    <div class="logo-icon">🌌</div>
-    <h1>COSMOS</h1>
-    <p>SPACE EXPLORER AI · v3.0</p>
+<!-- ── SIDEBAR ─────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">🍳</div>
+      <div class="logo-name">CULINA</div>
+    </div>
+    <div class="logo-sub">AI Chef · Kitchen Assistant</div>
   </div>
 
-  <button class="new-chat-btn" onclick="startNewChat()">
-    <span>+</span>
-    NEW MISSION
+  <button class="new-kitchen-btn" onclick="newKitchen()">
+    <span>+</span> New Kitchen
   </button>
 
-  <div class="history-label">RECENT MISSIONS</div>
-  <div class="history-list" id="history-list"></div>
+  <div class="sidebar-section-title">My Kitchens</div>
+  <div class="sessions-list" id="sessions-list"></div>
 
-  <div class="sidebar-footer">
-    <div style="font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:1px;">
-      SESSION · <span id="session-footer" style="color:var(--aurora)"></span>
+  <!-- Bottom tabbed sidebar -->
+  <div class="sidebar-bottom">
+    <div class="sidebar-tab-bar">
+      <div class="sidebar-tab active" onclick="switchSidebarTab('profile', this)">🧑 Profile</div>
+      <div class="sidebar-tab" onclick="switchSidebarTab('pantry', this)">🧺 Pantry</div>
     </div>
-    <div class="online-dot">
-      <div class="pulse"></div>
-      <span style="font-size:9px;letter-spacing:1px;">ONLINE</span>
+
+    <!-- Profile panel -->
+    <div class="sidebar-panel active" id="sidebar-panel-profile">
+      <div class="sidebar-profile">
+        <div class="profile-label">Dietary Profile</div>
+        <div class="dietary-chips" id="dietary-chips">
+          <div class="dietary-chip" data-val="vegetarian" onclick="toggleDiet(this)">🌱 Veg</div>
+          <div class="dietary-chip" data-val="vegan" onclick="toggleDiet(this)">🌿 Vegan</div>
+          <div class="dietary-chip" data-val="gluten-free" onclick="toggleDiet(this)">🌾 GF</div>
+          <div class="dietary-chip" data-val="dairy-free" onclick="toggleDiet(this)">🥛 DF</div>
+          <div class="dietary-chip" data-val="nut-free" onclick="toggleDiet(this)">🥜 NF</div>
+          <div class="dietary-chip" data-val="keto" onclick="toggleDiet(this)">⚡ Keto</div>
+          <div class="dietary-chip" data-val="halal" onclick="toggleDiet(this)">☪ Halal</div>
+        </div>
+        <div class="profile-label">Cooking Skill</div>
+        <select class="skill-select" id="skill-select" onchange="saveProfile()">
+          <option value="beginner">🔰 Beginner Cook</option>
+          <option value="intermediate" selected>🍽 Intermediate Cook</option>
+          <option value="advanced">👨‍🍳 Advanced Cook</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Pantry panel -->
+    <div class="sidebar-panel" id="sidebar-panel-pantry">
+      <div class="pantry-panel">
+        <div class="profile-label">My Fridge & Pantry</div>
+        <div class="pantry-input-row">
+          <input class="pantry-input" id="pantry-input" placeholder="Add ingredient…"
+            onkeydown="if(event.key==='Enter')addPantryItem()"/>
+          <button class="pantry-add-btn" onclick="addPantryItem()">+</button>
+        </div>
+        <div class="pantry-chips" id="pantry-chips">
+          <div class="pantry-empty" id="pantry-empty">No ingredients yet. Add what's in your fridge!</div>
+        </div>
+        <button class="pantry-suggest-btn" onclick="suggestFromPantry()">
+          🍽 Suggest recipe from my pantry
+        </button>
+      </div>
     </div>
   </div>
-</div>
+</aside>
 
+<!-- ── MAIN ──────────────────────────────────────── -->
 <div class="main">
+  <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-left">
-      <div class="topbar-avatar">🔭</div>
-      <div>
-        <div class="topbar-title">COSMOS AI</div>
-        <div class="topbar-sub">NEURAL SPACE INTELLIGENCE</div>
-      </div>
+      <div class="topbar-kitchen" id="topbar-kitchen">New Kitchen</div>
+      <div class="topbar-intent" id="topbar-intent"></div>
     </div>
     <div class="topbar-right">
-      <div class="topbar-session" id="session-topbar"></div>
-      <button class="reset-btn" onclick="startNewChat()">⟳ RESET</button>
+      <div class="status-dot">ONLINE</div>
+      <button class="btn-icon" onclick="clearHistory()" title="Clear chat">🗑</button>
     </div>
   </div>
 
-  <div id="chat-window">
-    <!-- Welcome screen -->
-    <div class="welcome" id="welcome-screen">
-      <div class="welcome-icon">🌠</div>
-      <h2>EXPLORE THE COSMOS</h2>
-      <p>Your AI guide to the universe. Ask me anything about black holes, exoplanets, missions, or the fundamental laws of spacetime. You can even upload images of celestial objects for analysis.</p>
-      <div class="welcome-chips">
-        <div class="chip" onclick="sendChip('What is a neutron star?')">🌟 Neutron Stars</div>
-        <div class="chip" onclick="sendChip('How do black holes form?')">🕳️ Black Holes</div>
-        <div class="chip" onclick="sendChip('Tell me about the James Webb Space Telescope')">🔭 James Webb</div>
-        <div class="chip" onclick="sendChip('What is dark matter?')">🌑 Dark Matter</div>
-        <div class="chip" onclick="sendChip('How many exoplanets have we discovered?')">🪐 Exoplanets</div>
-        <div class="chip" onclick="sendChip('Explain the Big Bang theory')">💥 Big Bang</div>
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab('chat', this)">💬 Chat</div>
+    <div class="tab" onclick="switchTab('recipes', this)">📖 Cookbook</div>
+  </div>
+
+  <!-- Chat tab -->
+  <div id="tab-chat" style="flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;">
+    <div id="chat-window">
+      <div class="welcome" id="welcome-screen">
+        <span class="welcome-flame">🔥</span>
+        <h1>Your AI Chef is Ready</h1>
+        <p>Ask for recipes, scan your fridge, plan meals, decode nutrition — or just chat about food.</p>
+        <div class="welcome-grid">
+          <div class="welcome-card" onclick="quickSend('Give me a 30-minute weeknight pasta recipe')">
+            <span class="welcome-card-icon">🍝</span>
+            <div class="welcome-card-title">Quick Weeknight Dinner</div>
+            <div class="welcome-card-sub">30-minute pasta recipe</div>
+          </div>
+          <div class="welcome-card" onclick="quickSend('Analyze the nutrition in a bowl of oatmeal with berries')">
+            <span class="welcome-card-icon">📊</span>
+            <div class="welcome-card-title">Nutrition Analysis</div>
+            <div class="welcome-card-sub">Macros & health breakdown</div>
+          </div>
+          <div class="welcome-card" onclick="quickSend('Plan me a healthy meal plan for the week')">
+            <span class="welcome-card-icon">📅</span>
+            <div class="welcome-card-title">Weekly Meal Plan</div>
+            <div class="welcome-card-sub">Balanced & delicious</div>
+          </div>
+          <div class="welcome-card" onclick="suggestFromPantry()">
+            <span class="welcome-card-icon">🧺</span>
+            <div class="welcome-card-title">Cook from My Pantry</div>
+            <div class="welcome-card-sub">Use what you have</div>
+          </div>
+        </div>
+      </div>
+      <div class="msg-row ai" id="typing-indicator" style="display:none;">
+        <div class="msg-avatar ai-avatar">🍳</div>
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
       </div>
     </div>
-    <div id="typing-indicator" class="msg-row">
-      <div class="msg-avatar ai-avatar">🤖</div>
-      <div class="typing-dots">
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
+
+    <!-- Input area -->
+    <div class="input-area">
+      <div class="image-preview-bar" id="image-preview-bar">
+        <img class="preview-thumb" id="preview-thumb" src="" alt="preview"/>
+        <span class="preview-name" id="preview-name">image.jpg</span>
+        <button class="remove-img-btn" onclick="removeImage()">✕</button>
       </div>
+      <div class="input-box">
+        <input type="file" id="file-input" accept="image/*" onchange="handleFile(event)"/>
+        <button class="icon-btn" onclick="document.getElementById('file-input').click()" title="Upload food photo">📷</button>
+        <textarea id="msg-input" rows="1"
+          placeholder="Ask CULINA anything… recipes, nutrition, techniques…"
+          oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()" title="Send">➤</button>
+      </div>
+      <div class="input-hint">🔒 Secure · Private · Powered by CULINA AI</div>
     </div>
   </div>
 
+  <!-- Recipes tab (Cookbook) -->
+  <div id="tab-recipes" class="recipes-panel" style="display:none;">
+    <div class="panel-title">📖 My Cookbook</div>
+    <div class="panel-sub">Recipes you've saved — search, favorite, and cook from them.</div>
 
-  <div class="input-area">
-    <div id="rate-limit-banner">⚠ Too many transmissions. Please wait before sending again.</div>
-    <div id="image-preview-bar">
-      <img id="image-preview-thumb" src="" alt="preview">
-      <span id="image-preview-name"></span>
-      <button id="remove-image-btn" onclick="removeImage()" title="Remove image">✕</button>
+    <div class="recipes-toolbar">
+      <input class="recipe-search-box" id="recipe-search-input"
+        placeholder="🔍 Search title or ingredient…"
+        oninput="debounceSearch()"
+        type="search"/>
+      <button class="fav-filter-btn" id="fav-filter-btn" onclick="toggleFavFilter()">
+        ⭐ Favorites only
+      </button>
     </div>
-    <div class="input-box">
-      <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(event)">
-      <button class="icon-btn" onclick="document.getElementById('file-input').click()" title="Upload celestial image">📎</button>
-      <textarea
-        id="msg"
-        rows="1"
-        placeholder="Transmit your question to COSMOS..."
-        oninput="autoResize(this)"
-        onkeydown="handleKey(event)"
-      ></textarea>
-      <button class="send-btn" onclick="send()" title="Send message">➤</button>
+
+    <div class="recipes-grid" id="recipes-grid">
+      <div style="color:var(--dimmer);font-size:14px;grid-column:1/-1;text-align:center;padding:48px;">
+        No saved recipes yet. Chat with CULINA and save your favorites!
+      </div>
     </div>
-    <div class="input-hint">SECURE · PRIVATE · POWERED BY NEURAL SPACE INTELLIGENCE</div>
   </div>
 </div>
 
+<!-- ── COOKING MODE MODAL ──────────────────────── -->
+<div class="cooking-modal" id="cooking-modal">
+  <div class="cooking-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+      <div style="font-family:'Playfair Display',serif;font-size:17px;color:var(--cream);">👨‍🍳 Cooking Mode</div>
+      <button class="btn-icon" onclick="closeCookingMode()">✕</button>
+    </div>
+    <div class="cooking-step-num" id="step-num">STEP 1 OF 5</div>
+    <div class="cooking-step-text" id="step-text">Loading recipe steps…</div>
+    <div class="cooking-nav">
+      <button class="cook-btn" id="prev-btn" onclick="prevStep()" disabled>← Back</button>
+      <span class="step-progress" id="step-dots">● ○ ○</span>
+      <button class="cook-btn primary" id="next-btn" onclick="nextStep()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
 <script>
-// ── CONFIG ───────────────────────────────────────────────────
-const SHARED_SECRET = "honey"; // Must match your .env SHARED_SECRET
-const MAX_RPM = 10;
-const CLIENT_RATE_WINDOW = 60000;
+// ── CONFIG ─────────────────────────────────────────────────────
+const API_BASE   = "http://127.0.0.1:8000";
+const API_SECRET = "honey"; // Change to match your SHARED_SECRET
 
-// ── STATE ───────────────────────────────────────────────────
-let sessions = JSON.parse(localStorage.getItem("cosmos_sessions") || "[]");
-let currentSessionId = localStorage.getItem("cosmos_active") || null;
-let pendingImageData = null;
-let pendingImageName = null;
-let requestTimestamps = JSON.parse(localStorage.getItem("cosmos_ratedata") || "[]");
+// ── STATE ──────────────────────────────────────────────────────
+let currentSession      = null;
+let sessions            = JSON.parse(localStorage.getItem("culina_sessions") || "[]");
+let pendingImage        = null;
+let dietaryRestrictions = JSON.parse(localStorage.getItem("culina_diet") || "[]");
+let skillLevel          = localStorage.getItem("culina_skill") || "intermediate";
+let pantryItems         = []; // loaded per-session from API
+let cookingSteps        = [];
+let cookingIndex        = 0;
+let isThinking          = false;
+let favFilterOn         = false;
+let searchDebounce      = null;
 
-// ── INIT ─────────────────────────────────────────────────────
-function init() {
-  if (!currentSessionId) {
-    startNewChat();
-  } else {
-    updateSessionUI();
-    renderHistory();
-  }
-}
-
-function startNewChat() {
-  currentSessionId = "MISSION-" + Date.now().toString(36).toUpperCase();
-  sessions.unshift(currentSessionId);
-  if (sessions.length > 15) sessions.pop();
-  
-  localStorage.setItem("cosmos_sessions", JSON.stringify(sessions));
-  localStorage.setItem("cosmos_active", currentSessionId);
-  
-  updateSessionUI();
-  renderHistory();
-  clearChat();
-}
-
-function switchSession(id) {
-  currentSessionId = id;
-  localStorage.setItem("cosmos_active", id);
-  updateSessionUI();
-  renderHistory();
-  clearChat();
-  appendMessage("ai", `🛸 Resuming mission <strong style="color:var(--aurora)">${id}</strong>. Neural network synced. What shall we explore?`);
-}
-
-function updateSessionUI() {
-  const short = currentSessionId.slice(-8);
-  document.getElementById("session-footer").textContent = short;
-  document.getElementById("session-topbar").textContent = short;
-}
-
-function renderHistory() {
-  const list = document.getElementById("history-list");
-  list.innerHTML = "";
-  sessions.forEach(id => {
-    const el = document.createElement("div");
-    el.className = `session-item ${id === currentSessionId ? "active" : ""}`;
-    el.innerHTML = `<div class="session-dot"></div><div class="session-name">${id}</div>`;
-    el.onclick = () => switchSession(id);
-    list.appendChild(el);
+// ── INIT ───────────────────────────────────────────────────────
+(function init() {
+  document.querySelectorAll(".dietary-chip").forEach(chip => {
+    if (dietaryRestrictions.includes(chip.dataset.val)) chip.classList.add("active");
   });
+  document.getElementById("skill-select").value = skillLevel;
+
+  if (sessions.length > 0) {
+    renderSessionList();
+    loadSession(sessions[0].id);
+  } else {
+    newKitchen();
+  }
+})();
+
+// ── SESSION MANAGEMENT ─────────────────────────────────────────
+function newKitchen() {
+  const id   = "KITCHEN-" + Math.random().toString(36).substr(2,8).toUpperCase();
+  const name = "Kitchen " + (sessions.length + 1);
+  sessions.unshift({ id, name, created: Date.now() });
+  saveSessions();
+  renderSessionList();
+  loadSession(id);
 }
 
-function clearChat() {
+function loadSession(id) {
+  currentSession = id;
+  const sess = sessions.find(s => s.id === id);
+  document.getElementById("topbar-kitchen").textContent = sess ? sess.name : id;
+  document.querySelectorAll(".session-item").forEach(el =>
+    el.classList.toggle("active", el.dataset.id === id)
+  );
   const cw = document.getElementById("chat-window");
   cw.innerHTML = `
     <div class="welcome" id="welcome-screen">
-      <div class="welcome-icon">🌠</div>
-      <h2>EXPLORE THE COSMOS</h2>
-      <p>Your AI guide to the universe. Ask me anything about black holes, exoplanets, missions, or the fundamental laws of spacetime. You can even upload images of celestial objects for analysis.</p>
-      <div class="welcome-chips">
-        <div class="chip" onclick="sendChip('What is a neutron star?')">🌟 Neutron Stars</div>
-        <div class="chip" onclick="sendChip('How do black holes form?')">🕳️ Black Holes</div>
-        <div class="chip" onclick="sendChip('Tell me about the James Webb Space Telescope')">🔭 James Webb</div>
-        <div class="chip" onclick="sendChip('What is dark matter?')">🌑 Dark Matter</div>
-        <div class="chip" onclick="sendChip('How many exoplanets have we discovered?')">🪐 Exoplanets</div>
-        <div class="chip" onclick="sendChip('Explain the Big Bang theory')">💥 Big Bang</div>
+      <span class="welcome-flame">🔥</span>
+      <h1>Your AI Chef is Ready</h1>
+      <p>Ask for recipes, scan your fridge, plan meals, decode nutrition — or just chat about food.</p>
+      <div class="welcome-grid">
+        <div class="welcome-card" onclick="quickSend('Give me a 30-minute weeknight pasta recipe')"><span class="welcome-card-icon">🍝</span><div class="welcome-card-title">Quick Weeknight Dinner</div><div class="welcome-card-sub">30-minute pasta recipe</div></div>
+        <div class="welcome-card" onclick="quickSend('Analyze the nutrition in a bowl of oatmeal with berries')"><span class="welcome-card-icon">📊</span><div class="welcome-card-title">Nutrition Analysis</div><div class="welcome-card-sub">Macros & health breakdown</div></div>
+        <div class="welcome-card" onclick="quickSend('Plan me a healthy meal plan for the week')"><span class="welcome-card-icon">📅</span><div class="welcome-card-title">Weekly Meal Plan</div><div class="welcome-card-sub">Balanced & delicious</div></div>
+        <div class="welcome-card" onclick="suggestFromPantry()"><span class="welcome-card-icon">🧺</span><div class="welcome-card-title">Cook from My Pantry</div><div class="welcome-card-sub">Use what you have</div></div>
       </div>
     </div>
-  `;
-  pendingImageData = null;
-  pendingImageName = null;
-  document.getElementById("image-preview-bar").style.display = "none";
+    <div class="msg-row ai" id="typing-indicator" style="display:none;">
+      <div class="msg-avatar ai-avatar">🍳</div>
+      <div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+    </div>`;
+  loadHistory();
+  loadPantry();
+  switchTab('chat', document.querySelector('.tab'));
 }
 
-// ── CLIENT SIDE RATE LIMITING ─────────────────────────────────
-function isClientRateLimited() {
-  const now = Date.now();
-  requestTimestamps = requestTimestamps.filter(t => now - t < CLIENT_RATE_WINDOW);
-  if (requestTimestamps.length >= MAX_RPM) return true;
-  requestTimestamps.push(now);
-  localStorage.setItem("cosmos_ratedata", JSON.stringify(requestTimestamps));
-  return false;
+function saveSessions() { localStorage.setItem("culina_sessions", JSON.stringify(sessions)); }
+
+function renderSessionList() {
+  const list = document.getElementById("sessions-list");
+  list.innerHTML = sessions.map(s => `
+    <div class="session-item ${s.id === currentSession ? 'active' : ''}" data-id="${s.id}"
+      onclick="loadSession('${s.id}')">
+      <div class="session-dot"></div>
+      <div class="session-name">${escapeHtml(s.name)}</div>
+      <button class="session-del" onclick="event.stopPropagation();deleteSession('${s.id}')" title="Delete">✕</button>
+    </div>`).join("");
 }
 
-// ── SEND ─────────────────────────────────────────────────────
-async function send() {
-  const textarea = document.getElementById("msg");
-  const msg = textarea.value.trim();
-  if (!msg) return;
+function deleteSession(id) {
+  if (!confirm("Delete this kitchen and its local record?")) return;
+  sessions = sessions.filter(s => s.id !== id);
+  saveSessions();
+  if (currentSession === id) {
+    sessions.length > 0 ? loadSession(sessions[0].id) : newKitchen();
+  }
+  renderSessionList();
+}
 
-  if (isClientRateLimited()) {
-    showRateLimitBanner();
+// ── SIDEBAR TAB SWITCHER ────────────────────────────────────────
+function switchSidebarTab(tab, el) {
+  document.querySelectorAll(".sidebar-tab").forEach(t => t.classList.remove("active"));
+  if (el) el.classList.add("active");
+  document.querySelectorAll(".sidebar-panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("sidebar-panel-" + tab).classList.add("active");
+}
+
+// ── PROFILE ────────────────────────────────────────────────────
+function toggleDiet(chip) {
+  chip.classList.toggle("active");
+  const val = chip.dataset.val;
+  if (chip.classList.contains("active")) {
+    if (!dietaryRestrictions.includes(val)) dietaryRestrictions.push(val);
+  } else {
+    dietaryRestrictions = dietaryRestrictions.filter(d => d !== val);
+  }
+  localStorage.setItem("culina_diet", JSON.stringify(dietaryRestrictions));
+}
+
+function saveProfile() {
+  skillLevel = document.getElementById("skill-select").value;
+  localStorage.setItem("culina_skill", skillLevel);
+}
+
+// ── PANTRY ─────────────────────────────────────────────────────
+async function loadPantry() {
+  if (!currentSession) return;
+  try {
+    const res = await fetch(`${API_BASE}/pantry/${currentSession}`, {
+      headers: { "X-Api-Secret": API_SECRET }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    pantryItems = data.items || [];
+    renderPantryChips();
+  } catch(e) {
+    // silently fail if DB not connected
+    pantryItems = JSON.parse(localStorage.getItem("culina_pantry_" + currentSession) || "[]");
+    renderPantryChips();
+  }
+}
+
+async function savePantryToAPI() {
+  try {
+    await fetch(`${API_BASE}/pantry`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "X-Api-Secret": API_SECRET },
+      body: JSON.stringify({ session_id: currentSession, items: pantryItems })
+    });
+  } catch(e) {
+    // fallback: save locally
+    localStorage.setItem("culina_pantry_" + currentSession, JSON.stringify(pantryItems));
+  }
+}
+
+function renderPantryChips() {
+  const container = document.getElementById("pantry-chips");
+  const empty     = document.getElementById("pantry-empty");
+  if (!pantryItems.length) {
+    container.innerHTML = `<div class="pantry-empty" id="pantry-empty">No ingredients yet. Add what's in your fridge!</div>`;
     return;
   }
+  container.innerHTML = pantryItems.map((item, i) => `
+    <div class="pantry-chip">
+      <span>${escapeHtml(item)}</span>
+      <button class="pantry-chip-del" onclick="removePantryItem(${i})" title="Remove">✕</button>
+    </div>`).join("");
+}
 
-  // Hide welcome screen if present
-  const ws = document.getElementById("welcome-screen");
-  if (ws) ws.remove();
-
-  const imageToSend = pendingImageData;
-  appendMessage("user", sanitizeInput(msg), pendingImageData);
-  
-  textarea.value = "";
-  autoResize(textarea);
-  removeImage();
-
-  // Show typing
-  showTyping();
-
-  try {
-    const payload = {
-      message: msg,
-      session_id: currentSessionId
-    };
-    if (imageToSend) payload.image_data = imageToSend;
-
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Secret": SHARED_SECRET,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-    hideTyping();
-
-    if (res.status === 429) {
-      showRateLimitBanner();
-      return;
+function addPantryItem() {
+  const input = document.getElementById("pantry-input");
+  const val   = input.value.trim();
+  if (!val) return;
+  const items = val.split(",").map(v => v.trim()).filter(Boolean);
+  items.forEach(item => {
+    if (item && !pantryItems.includes(item.toLowerCase())) {
+      pantryItems.push(item.toLowerCase());
     }
+  });
+  input.value = "";
+  renderPantryChips();
+  savePantryToAPI();
+  showToast(`🧺 Added to pantry!`);
+}
 
-    if (data.error) {
-      appendMessage("ai", `⚠️ ${sanitizeInput(data.error)}`);
-    } else {
-      appendMessage("ai", formatResponse(data.response || data.message));
-    }
-  } catch (e) {
-    hideTyping();
-    appendMessage("ai", "⚠️ Signal lost. Check your connection and try again.");
+function removePantryItem(idx) {
+  pantryItems.splice(idx, 1);
+  renderPantryChips();
+  savePantryToAPI();
+}
+
+function suggestFromPantry() {
+  if (!pantryItems.length) {
+    showToast("🧺 Add some ingredients to your pantry first!");
+    switchSidebarTab('pantry', document.querySelectorAll('.sidebar-tab')[1]);
+    return;
+  }
+  quickSend(`I have these ingredients in my fridge/pantry: ${pantryItems.join(", ")}. What can I cook with them?`);
+}
+
+// ── TABS ───────────────────────────────────────────────────────
+function switchTab(tab, el) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  if (el) el.classList.add("active");
+  const chatDiv    = document.getElementById("tab-chat");
+  const recipesDiv = document.getElementById("tab-recipes");
+  if (tab === "chat") {
+    chatDiv.style.display = "flex";
+    recipesDiv.style.display = "none";
+  } else {
+    chatDiv.style.display = "none";
+    recipesDiv.style.display = "flex";
+    loadSavedRecipes();
   }
 }
 
-function showRateLimitBanner() {
-  const banner = document.getElementById("rate-limit-banner");
-  banner.style.display = "block";
-  setTimeout(() => banner.style.display = "none", 6000);
-}
-
-// ── TYPING INDICATOR ─────────────────────────────────────────
-function showTyping() {
-  const typing = document.getElementById("typing-indicator");
-  typing.style.display = "flex";
-  document.getElementById("chat-window").scrollTop = 999999;
-}
-
-function hideTyping() {
-  const typing = document.getElementById("typing-indicator");
-  typing.style.display = "none";
-}
-
-// ── APPEND MESSAGE (FIXED) ───────────────────────────────────
-function appendMessage(role, text, imageData = null) {
+// ── MESSAGING ──────────────────────────────────────────────────
+function appendMessage(role, html, imageData = null, recipeDetected = false, rawText = "") {
   const cw = document.getElementById("chat-window");
-  
+  const welcome = document.getElementById("welcome-screen");
+  if (welcome) welcome.remove();
+
+  const typing = document.getElementById("typing-indicator");
   const row = document.createElement("div");
   row.className = `msg-row ${role}`;
 
-  const avatarHTML = role === "ai" 
-    ? `<div class="msg-avatar ai-avatar">🤖</div>`
-    : `<div class="msg-avatar user-avatar">👨‍🚀</div>`;
+  const avatar = role === "ai"
+    ? `<div class="msg-avatar ai-avatar">🍳</div>`
+    : `<div class="msg-avatar user-avatar">👤</div>`;
 
-  const imgHTML = imageData 
-    ? `<img class="msg-image-preview" src="${imageData}" alt="uploaded image">` 
+  const imgHtml = imageData ? `<img class="msg-image" src="${imageData}" alt="uploaded"/>` : "";
+
+  const saveBtn = (role === "ai" && recipeDetected)
+    ? `<div class="recipe-actions">
+         <button class="save-recipe-btn" onclick="saveRecipe(this)" data-content="${encodeURIComponent(rawText)}">🔖 Save Recipe</button>
+         <button class="save-recipe-btn cooking" onclick="startCookingMode(this)" data-content="${encodeURIComponent(rawText)}">👨‍🍳 Cooking Mode</button>
+       </div>`
     : "";
 
-  const bubbleHTML = role === "ai"
-    ? `<div class="msg-bubble ai-bubble">${text}</div>`
-    : `<div class="msg-bubble user-bubble">${imgHTML}${text}</div>`;
+  const bubble = role === "ai"
+    ? `<div class="msg-bubble ai-bubble">${html}${saveBtn}</div>`
+    : `<div class="msg-bubble user-bubble">${imgHtml}${html}</div>`;
 
-  row.innerHTML = role === "ai" 
-    ? `${avatarHTML}${bubbleHTML}` 
-    : `${bubbleHTML}${avatarHTML}`;
+  row.innerHTML = role === "ai" ? `${avatar}${bubble}` : `${bubble}${avatar}`;
 
-  // Safe insertion - always append to chat-window
-  cw.appendChild(row);
+  if (typing && typing.parentNode === cw) {
+    cw.insertBefore(row, typing);
+  } else {
+    cw.appendChild(row);
+  }
   cw.scrollTop = cw.scrollHeight;
 }
 
-// ── UTILITIES ────────────────────────────────────────────────
-function sanitizeInput(str) {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+function setTyping(on) {
+  const el = document.getElementById("typing-indicator");
+  if (el) el.style.display = on ? "flex" : "none";
+  document.getElementById("send-btn").disabled = on;
+  isThinking = on;
 }
 
-function formatResponse(text) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/`(.*?)`/g, '<code style="background:rgba(79,195,247,0.1);padding:1px 5px;border-radius:4px;font-size:13px">$1</code>')
-    .replace(/\n/g, '<br>');
+function quickSend(text) {
+  document.getElementById("msg-input").value = text;
+  sendMessage();
 }
 
-function sendChip(text) {
-  document.getElementById("msg").value = text;
-  send();
-}
-
-// ── FILE UPLOAD ───────────────────────────────────────────────
-function handleFileSelect(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  if (!file.type.startsWith("image/")) {
-    alert("Only image files are supported.");
-    return;
-  }
-  if (file.size > 5 * 1024 * 1024) {
-    alert("Image too large. Max 5MB.");
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    pendingImageData = ev.target.result;
-    pendingImageName = file.name;
-
-    const bar = document.getElementById("image-preview-bar");
-    document.getElementById("image-preview-thumb").src = pendingImageData;
-    document.getElementById("image-preview-name").textContent = `📷 ${file.name}`;
-    bar.style.display = "flex";
-  };
-  reader.readAsDataURL(file);
-  e.target.value = "";
-}
-
-function removeImage() {
-  pendingImageData = null;
-  pendingImageName = null;
-  document.getElementById("image-preview-bar").style.display = "none";
+function handleKey(e) {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
 function autoResize(el) {
   el.style.height = "auto";
-  el.style.height = Math.min(el.scrollHeight, 120) + "px";
+  el.style.height = Math.min(el.scrollHeight, 130) + "px";
 }
 
-function handleKey(e) {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    send();
+// ── SEND MESSAGE ───────────────────────────────────────────────
+async function sendMessage() {
+  if (isThinking) return;
+  const input = document.getElementById("msg-input");
+  const text  = input.value.trim();
+  if (!text && !pendingImage) return;
+
+  appendMessage("user", text ? escapeHtml(text) : "📷 Image shared for analysis", pendingImage);
+  input.value = ""; input.style.height = "auto";
+  const imgData = pendingImage;
+  removeImage();
+  setTyping(true);
+
+  try {
+    const res = await fetch(`${API_BASE}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Api-Secret": API_SECRET },
+      body: JSON.stringify({
+        message:              text || "Please analyze this image and suggest what I can cook.",
+        session_id:           currentSession,
+        image_data:           imgData || undefined,
+        dietary_restrictions: dietaryRestrictions,
+        skill_level:          skillLevel
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      appendMessage("ai", `<span style="color:#ff8a80">⚠️ ${escapeHtml(data.detail || "Something went wrong.")}</span>`);
+      return;
+    }
+
+    const rendered = marked.parse(data.response || "");
+    appendMessage("ai", rendered, null, data.recipe_detected, data.response);
+
+    const badge = document.getElementById("topbar-intent");
+    if (data.intent && data.intent !== "general") {
+      badge.textContent = intentLabel(data.intent);
+      badge.style.display = "inline-flex";
+    } else {
+      badge.style.display = "none";
+    }
+
+    const sess = sessions.find(s => s.id === currentSession);
+    if (sess && sess.name.startsWith("Kitchen ")) {
+      sess.name = text ? text.slice(0, 30) + (text.length > 30 ? "…" : "") : "Photo Session";
+      saveSessions(); renderSessionList();
+      document.getElementById("topbar-kitchen").textContent = sess.name;
+    }
+
+    // If it was a pantry message, refresh pantry from server
+    if (data.intent === "pantry_management") {
+      setTimeout(loadPantry, 500);
+    }
+
+  } catch (err) {
+    appendMessage("ai", `<span style="color:#ff8a80">⚠️ Network error. Please check your connection.</span>`);
+    console.error(err);
+  } finally {
+    setTyping(false);
   }
 }
 
-// Initialize
-init();
+function intentLabel(intent) {
+  const map = {
+    recipe_generation: "🍳 Recipe", nutrition_analysis: "📊 Nutrition",
+    meal_planning: "📅 Meal Plan", ingredient_sub: "🔄 Substitution",
+    cooking_technique: "🎓 Technique", vision_analysis: "👁 Vision",
+    pantry_management: "🧺 Pantry", safety: "⚠️ Safety", general: "💬 Chat",
+  };
+  return map[intent] || intent;
+}
+
+// ── HISTORY ────────────────────────────────────────────────────
+async function loadHistory() {
+  try {
+    const res = await fetch(`${API_BASE}/history/${currentSession}`, {
+      headers: { "X-Api-Secret": API_SECRET }
+    });
+    if (!res.ok) return;
+    const msgs = await res.json();
+    if (!msgs || !msgs.length) return;
+    msgs.forEach(m => {
+      if (m.role === "user") appendMessage("user", escapeHtml(m.content));
+      else appendMessage("ai", marked.parse(m.content), null, false, m.content);
+    });
+  } catch(e) {}
+}
+
+async function clearHistory() {
+  if (!confirm("Clear this kitchen's chat history?")) return;
+  try {
+    await fetch(`${API_BASE}/history/${currentSession}`, {
+      method: "DELETE", headers: { "X-Api-Secret": API_SECRET }
+    });
+    loadSession(currentSession);
+    showToast("🗑 Kitchen cleared");
+  } catch(e) { showToast("❌ Could not clear history"); }
+}
+
+// ── IMAGE HANDLING ─────────────────────────────────────────────
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast("⚠️ Image must be under 5MB"); return; }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    pendingImage = ev.target.result;
+    document.getElementById("preview-thumb").src = pendingImage;
+    document.getElementById("preview-name").textContent = file.name;
+    document.getElementById("image-preview-bar").style.display = "flex";
+  };
+  reader.readAsDataURL(file);
+  e.target.value = "";
+}
+function removeImage() {
+  pendingImage = null;
+  document.getElementById("image-preview-bar").style.display = "none";
+  document.getElementById("preview-thumb").src = "";
+}
+
+// ── SAVE RECIPE ────────────────────────────────────────────────
+async function saveRecipe(btn) {
+  const content = decodeURIComponent(btn.dataset.content);
+  const firstLine = content.split("\n")[0].replace(/[#*]/g, "").trim();
+  const title = firstLine.length > 5 ? firstLine.slice(0, 80) : "Untitled Recipe";
+  try {
+    const res = await fetch(`${API_BASE}/recipes/save`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Api-Secret": API_SECRET },
+      body: JSON.stringify({ session_id: currentSession, title, content })
+    });
+    if (res.ok) {
+      showToast("🔖 Recipe saved to your cookbook!");
+      btn.textContent = "✅ Saved"; btn.disabled = true;
+    }
+  } catch(e) { showToast("❌ Could not save recipe"); }
+}
+
+// ── LOAD SAVED RECIPES ─────────────────────────────────────────
+async function loadSavedRecipes() {
+  const grid = document.getElementById("recipes-grid");
+  grid.innerHTML = `<div style="color:var(--dimmer);font-size:13px;grid-column:1/-1;text-align:center;padding:36px;">Loading…</div>`;
+
+  const searchVal = document.getElementById("recipe-search-input").value.trim();
+  let url = `${API_BASE}/recipes/${currentSession}`;
+  const params = [];
+  if (searchVal) params.push(`search=${encodeURIComponent(searchVal)}`);
+  if (favFilterOn) params.push("favorites_only=true");
+  if (params.length) url += "?" + params.join("&");
+
+  try {
+    const res = await fetch(url, { headers: { "X-Api-Secret": API_SECRET } });
+    if (!res.ok) throw new Error();
+    const recipes = await res.json();
+    if (!recipes.length) {
+      grid.innerHTML = `<div style="color:var(--dimmer);font-size:13px;grid-column:1/-1;text-align:center;padding:36px;">${
+        favFilterOn ? "No favorite recipes yet. ⭐ star a recipe to favorite it." :
+        searchVal   ? "No recipes match your search." :
+                      "No saved recipes yet. Chat with CULINA and save your favorites!"
+      }</div>`;
+      return;
+    }
+    const emojis = ["🍝","🍜","🥘","🍲","🥗","🍛","🥩","🍳","🥞","🍕","🥙","🫕","🍱","🥣","🧆"];
+    grid.innerHTML = recipes.map((r, i) => `
+      <div class="recipe-card" data-id="${r.id}" data-content="${encodeURIComponent(r.content)}">
+        <div class="recipe-card-header">
+          <span class="recipe-card-emoji">${emojis[i % emojis.length]}</span>
+          <button class="recipe-card-fav"
+            onclick="event.stopPropagation();toggleFavorite(${r.id}, this)"
+            title="${r.is_favorite ? 'Unfavorite' : 'Favorite'}"
+          >${r.is_favorite ? "⭐" : "☆"}</button>
+        </div>
+        <div class="recipe-card-title">${escapeHtml(r.title)}</div>
+        <div class="recipe-card-date">${new Date(r.created_at).toLocaleDateString()}</div>
+        <div class="recipe-card-preview">${escapeHtml(r.content.replace(/[#*]/g,"")).slice(0,160)}…</div>
+        <div class="recipe-card-footer">
+          <button class="card-btn" onclick="event.stopPropagation();openRecipeCard(this.closest('.recipe-card'))">👁 View</button>
+          <button class="card-btn" onclick="event.stopPropagation();startCookingModeFromCard(this.closest('.recipe-card'))">👨‍🍳 Cook</button>
+          <button class="card-btn danger" onclick="event.stopPropagation();deleteRecipe(${r.id})">🗑</button>
+        </div>
+      </div>`).join("");
+  } catch(e) {
+    grid.innerHTML = `<div style="color:var(--dimmer);font-size:13px;grid-column:1/-1;text-align:center;padding:36px;">Could not load recipes. Make sure the backend is running.</div>`;
+  }
+}
+
+function debounceSearch() {
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(loadSavedRecipes, 350);
+}
+
+function toggleFavFilter() {
+  favFilterOn = !favFilterOn;
+  const btn = document.getElementById("fav-filter-btn");
+  btn.classList.toggle("active", favFilterOn);
+  loadSavedRecipes();
+}
+
+async function toggleFavorite(recipeId, btn) {
+  try {
+    const res = await fetch(`${API_BASE}/recipes/${recipeId}/favorite`, {
+      method: "PATCH", headers: { "X-Api-Secret": API_SECRET }
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    btn.textContent = data.is_favorite ? "⭐" : "☆";
+    btn.title = data.is_favorite ? "Unfavorite" : "Favorite";
+    showToast(data.is_favorite ? "⭐ Added to favorites!" : "☆ Removed from favorites");
+  } catch(e) { showToast("❌ Could not update favorite"); }
+}
+
+async function deleteRecipe(recipeId) {
+  if (!confirm("Delete this recipe from your cookbook?")) return;
+  try {
+    const res = await fetch(`${API_BASE}/recipes/${recipeId}`, {
+      method: "DELETE", headers: { "X-Api-Secret": API_SECRET }
+    });
+    if (!res.ok) throw new Error();
+    showToast("🗑 Recipe deleted");
+    loadSavedRecipes();
+  } catch(e) { showToast("❌ Could not delete recipe"); }
+}
+
+function openRecipeCard(card) {
+  const content = decodeURIComponent(card.dataset.content);
+  switchTab('chat', document.querySelectorAll('.tab')[0]);
+  appendMessage("ai", marked.parse(content), null, true, content);
+}
+
+function startCookingModeFromCard(card) {
+  const content = decodeURIComponent(card.dataset.content);
+  const lines = content.split("\n");
+  cookingSteps = lines.filter(l => /^\d+[\.\)]/.test(l.trim())).map(l => l.replace(/^\d+[\.\)]\s*/,"").trim());
+  if (!cookingSteps.length) { showToast("⚠️ No numbered steps found"); return; }
+  cookingIndex = 0;
+  document.getElementById("cooking-modal").classList.add("active");
+  renderCookingStep();
+}
+
+// ── COOKING MODE ───────────────────────────────────────────────
+function startCookingMode(btn) {
+  const content = decodeURIComponent(btn.dataset.content);
+  const lines = content.split("\n");
+  cookingSteps = lines.filter(l => /^\d+[\.\)]/.test(l.trim())).map(l => l.replace(/^\d+[\.\)]\s*/,"").trim());
+  if (!cookingSteps.length) { showToast("⚠️ No numbered steps found in this recipe"); return; }
+  cookingIndex = 0;
+  document.getElementById("cooking-modal").classList.add("active");
+  renderCookingStep();
+}
+
+function renderCookingStep() {
+  document.getElementById("step-num").textContent = `STEP ${cookingIndex + 1} OF ${cookingSteps.length}`;
+  document.getElementById("step-text").textContent = cookingSteps[cookingIndex];
+  document.getElementById("prev-btn").disabled = cookingIndex === 0;
+  document.getElementById("next-btn").textContent = cookingIndex === cookingSteps.length - 1 ? "✅ Done!" : "Next →";
+  const dots = cookingSteps.map((_, i) => i === cookingIndex ? "●" : "○").join(" ");
+  document.getElementById("step-dots").textContent = dots;
+}
+
+function nextStep() {
+  if (cookingIndex < cookingSteps.length - 1) { cookingIndex++; renderCookingStep(); }
+  else { closeCookingMode(); showToast("🎉 Recipe complete! Bon appétit!"); }
+}
+function prevStep() { if (cookingIndex > 0) { cookingIndex--; renderCookingStep(); } }
+function closeCookingMode() { document.getElementById("cooking-modal").classList.remove("active"); }
+
+// ── UTILS ──────────────────────────────────────────────────────
+function escapeHtml(str) {
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 3000);
+}
 </script>
 </body>
 </html>
