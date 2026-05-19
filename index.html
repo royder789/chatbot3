@@ -277,6 +277,169 @@ body::before {
 }
 @keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:.4; } }
 
+/* ── VIDEO LAB ──────────────────────────────────────── */
+.video-panel {
+  flex: 1; display: none; flex-direction: column;
+  overflow-y: auto; padding: 28px 36px 36px; gap: 24px;
+}
+.video-panel.active { display: flex; }
+
+.video-panel-title {
+  font-family: 'Playfair Display', serif; font-size: 22px;
+  background: linear-gradient(135deg, var(--cream), var(--amber));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 4px;
+}
+.video-panel-sub { font-size: 13px; color: var(--dimmer); margin-bottom: 18px; }
+
+.video-url-row {
+  display: flex; gap: 10px; margin-bottom: 20px;
+}
+.video-url-input {
+  flex: 1; background: var(--glass);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); font-size: 13px; padding: 10px 16px;
+  font-family: 'DM Sans', sans-serif; transition: border-color 0.15s;
+}
+.video-url-input::placeholder { color: var(--dimmer); }
+.video-url-input:focus { outline: none; border-color: var(--amber); }
+.video-load-btn {
+  padding: 10px 22px;
+  background: linear-gradient(135deg, var(--ember), #c8511a);
+  border: none; border-radius: var(--radius-sm);
+  color: #fff; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  box-shadow: var(--glow-ember);
+}
+.video-load-btn:hover { transform: translateY(-1px); }
+.video-load-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.video-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+@media (max-width: 960px) { .video-layout { grid-template-columns: 1fr; } }
+
+.video-embed-wrap {
+  border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--border); aspect-ratio: 16/9;
+  background: var(--smoke); position: relative;
+}
+.video-embed-wrap iframe {
+  width: 100%; height: 100%; border: none; display: block;
+}
+.video-embed-placeholder {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px;
+  color: var(--dimmer); font-size: 13px;
+}
+.video-embed-placeholder span { font-size: 40px; }
+
+.video-info-panel {
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.vcard {
+  background: rgba(20,34,20,0.7); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 18px;
+  backdrop-filter: blur(10px);
+}
+.vcard-title {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 10px; display: flex;
+  align-items: center; gap: 6px;
+}
+.vcard-title .vcard-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--ember); box-shadow: var(--glow-ember);
+  flex-shrink: 0;
+}
+
+/* Recipe extract card */
+.recipe-extract { font-size: 13px; color: var(--text); line-height: 1.7; max-height: 220px; overflow-y: auto; }
+.recipe-extract h1,.recipe-extract h2,.recipe-extract h3 {
+  font-family: 'Playfair Display', serif; color: var(--amber); margin: 10px 0 5px;
+}
+.recipe-extract p { margin: 5px 0; }
+.recipe-extract ul,.recipe-extract ol { padding-left: 16px; margin: 5px 0; }
+.recipe-extract li { margin: 3px 0; }
+.recipe-extract strong { color: var(--cream); }
+.vcard-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.vcard-btn {
+  padding: 5px 14px; font-size: 11px; font-family: 'DM Sans', sans-serif;
+  border-radius: 99px; cursor: pointer; transition: all 0.15s;
+  border: 1px solid var(--border-hi); background: transparent;
+  color: var(--ember); display: flex; align-items: center; gap: 4px;
+}
+.vcard-btn:hover { background: rgba(232,98,26,0.12); }
+.vcard-btn.green { color: var(--sage); border-color: rgba(74,124,89,0.4); }
+.vcard-btn.green:hover { background: rgba(74,124,89,0.12); }
+.vcard-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Timestamps */
+.timestamps-list { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
+.ts-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 10px; border-radius: var(--radius-sm);
+  border: 1px solid transparent; cursor: pointer;
+  transition: all 0.15s; font-size: 12px;
+}
+.ts-item:hover { background: var(--mist); border-color: var(--border); }
+.ts-badge {
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  color: var(--ember); background: rgba(232,98,26,0.1);
+  border-radius: 4px; padding: 2px 7px; flex-shrink: 0;
+  border: 1px solid rgba(232,98,26,0.2);
+}
+.ts-label { color: var(--dim); flex: 1; }
+
+/* Quiz */
+.quiz-container { display: flex; flex-direction: column; gap: 14px; }
+.quiz-question-num {
+  font-size: 9px; letter-spacing: 2px; color: var(--dimmer); text-transform: uppercase;
+}
+.quiz-question-text { font-size: 14px; color: var(--text); line-height: 1.5; margin-bottom: 4px; }
+.quiz-options { display: flex; flex-direction: column; gap: 7px; }
+.quiz-option {
+  padding: 9px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--glass);
+  color: var(--dim); font-size: 13px; cursor: pointer;
+  transition: all 0.15s; text-align: left; font-family: 'DM Sans', sans-serif;
+}
+.quiz-option:hover:not(:disabled) { border-color: var(--amber); color: var(--text); background: rgba(245,166,35,0.05); }
+.quiz-option.correct { border-color: var(--sage); background: rgba(74,124,89,0.15); color: #8fc99e; }
+.quiz-option.wrong   { border-color: #ef5350; background: rgba(239,83,80,0.1); color: #ff8a80; }
+.quiz-option:disabled { cursor: default; }
+.quiz-explanation { font-size: 12px; color: var(--dimmer); margin-top: 8px; padding: 8px 12px; border-radius: 6px; background: rgba(0,0,0,0.2); border-left: 3px solid var(--amber); }
+.quiz-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.quiz-score { font-size: 12px; color: var(--dimmer); }
+.quiz-next-btn {
+  padding: 7px 18px; border-radius: 99px;
+  background: linear-gradient(135deg, var(--ember), #c8511a);
+  border: none; color: #fff; font-size: 12px; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all 0.15s; display: none;
+}
+.quiz-next-btn:hover { box-shadow: var(--glow-ember); }
+.quiz-next-btn.visible { display: block; }
+.quiz-loading { color: var(--dimmer); font-size: 13px; text-align: center; padding: 20px; }
+
+/* Pantry check */
+.pantry-check-list { display: flex; flex-direction: column; gap: 6px; }
+.pantry-check-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.pantry-check-icon { font-size: 14px; flex-shrink: 0; }
+.pantry-check-name { color: var(--dim); }
+.pantry-check-name.have { color: #8fc99e; }
+.pantry-check-name.missing { color: #ff8a80; text-decoration-line: underline; text-decoration-style: dashed; text-decoration-color: rgba(239,83,80,0.4); }
+.pantry-check-summary { font-size: 12px; color: var(--dimmer); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+.video-empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 60px 20px; text-align: center;
+  color: var(--dimmer); font-size: 13px;
+}
+.video-empty-state span { font-size: 52px; }
+.video-empty-state strong { color: var(--dim); font-size: 15px; }
+
 /* ── TAB BAR ────────────────────────────────────────── */
 .tab-bar {
   display: flex; gap: 4px; padding: 0 28px;
@@ -681,6 +844,7 @@ body::before {
   <div class="tab-bar">
     <div class="tab active" onclick="switchTab('chat', this)">💬 Chat</div>
     <div class="tab" onclick="switchTab('recipes', this)">📖 Cookbook</div>
+    <div class="tab" onclick="switchTab('video', this)">🎬 Video Lab</div>
   </div>
 
   <!-- Chat tab -->
@@ -763,6 +927,81 @@ body::before {
       </div>
     </div>
   </div>
+
+  <!-- Video Lab tab -->
+  <div id="tab-video" class="video-panel">
+    <div>
+      <div class="video-panel-title">🎬 Video Recipe Lab</div>
+      <div class="video-panel-sub">Paste any YouTube cooking video — AI extracts the recipe, creates timestamps, quizzes you on techniques, and checks your pantry.</div>
+    </div>
+
+    <div class="video-url-row">
+      <input class="video-url-input" id="video-url-input"
+        placeholder="https://www.youtube.com/watch?v=…  paste any cooking video URL"
+        onkeydown="if(event.key==='Enter') loadVideo()"/>
+      <button class="video-load-btn" id="video-load-btn" onclick="loadVideo()">🎬 Analyze Video</button>
+    </div>
+
+    <div id="video-empty-state" class="video-empty-state">
+      <span>🎬</span>
+      <strong>Paste a cooking video URL above</strong>
+      <p>CULINA will extract the recipe, generate smart timestamps,<br>quiz you on techniques, and check your pantry — all from one video.</p>
+    </div>
+
+    <div id="video-content" style="display:none;">
+      <div class="video-layout">
+        <!-- Left: player + recipe -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="video-embed-wrap" id="video-embed-wrap">
+            <div class="video-embed-placeholder">
+              <span>▶️</span>
+              <div>Video will appear here</div>
+            </div>
+          </div>
+
+          <!-- Recipe extract -->
+          <div class="vcard">
+            <div class="vcard-title"><div class="vcard-dot"></div>Extracted Recipe</div>
+            <div class="recipe-extract" id="recipe-extract-content">
+              <div class="quiz-loading">Analyzing video…</div>
+            </div>
+            <div class="vcard-actions">
+              <button class="vcard-btn" id="save-video-recipe-btn" onclick="saveVideoRecipe()" disabled>🔖 Save to Cookbook</button>
+              <button class="vcard-btn" id="cook-video-btn" onclick="cookVideoRecipe()" disabled>👨‍🍳 Cooking Mode</button>
+              <button class="vcard-btn green" id="send-video-chat-btn" onclick="sendVideoToChat()" disabled>💬 Ask Chef About This</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: timestamps + quiz + pantry -->
+        <div class="video-info-panel">
+          <!-- Timestamps -->
+          <div class="vcard">
+            <div class="vcard-title"><div class="vcard-dot"></div>Smart Timestamps</div>
+            <div class="timestamps-list" id="timestamps-list">
+              <div class="quiz-loading">Generating chapters…</div>
+            </div>
+          </div>
+
+          <!-- Pantry Check -->
+          <div class="vcard">
+            <div class="vcard-title"><div class="vcard-dot"></div>Pantry Check</div>
+            <div class="pantry-check-list" id="pantry-check-list">
+              <div class="quiz-loading">Checking your pantry…</div>
+            </div>
+          </div>
+
+          <!-- Quiz -->
+          <div class="vcard">
+            <div class="vcard-title"><div class="vcard-dot"></div>Technique Quiz</div>
+            <div id="quiz-area">
+              <div class="quiz-loading">Preparing quiz…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ── COOKING MODE MODAL ──────────────────────── -->
@@ -787,8 +1026,19 @@ body::before {
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────────────
-const API_BASE   = "http://127.0.0.1:8000";
-const API_SECRET = "honey"; // Change to match your SHARED_SECRET
+// API_BASE: backend URL. Change only if your server runs elsewhere.
+const API_BASE = "http://127.0.0.1:8000";
+
+// API_SECRET: must match SHARED_SECRET in your .env file.
+// For local development you can set it here directly (keep it out of version control).
+// For production, load it from a build-time environment variable or a secure config loader.
+const API_SECRET = (() => {
+  // 1. Check sessionStorage (lets you inject it at runtime without touching source)
+  const stored = sessionStorage.getItem("culina_api_secret");
+  if (stored) return stored;
+  // 2. Fallback: hardcoded dev value — CHANGE THIS to match your SHARED_SECRET
+  return "honey";
+})();
 
 // ── STATE ──────────────────────────────────────────────────────
 let currentSession      = null;
@@ -987,15 +1237,336 @@ function switchTab(tab, el) {
   if (el) el.classList.add("active");
   const chatDiv    = document.getElementById("tab-chat");
   const recipesDiv = document.getElementById("tab-recipes");
-  if (tab === "chat") {
-    chatDiv.style.display = "flex";
-    recipesDiv.style.display = "none";
-  } else {
-    chatDiv.style.display = "none";
-    recipesDiv.style.display = "flex";
-    loadSavedRecipes();
+  const videoDiv   = document.getElementById("tab-video");
+  // Chat and Recipes use display flex/none; Video uses .active CSS class
+  chatDiv.style.display    = tab === "chat"    ? "flex"  : "none";
+  recipesDiv.style.display = tab === "recipes" ? "flex"  : "none";
+  // For video tab: use the CSS active class (not style.display, which conflicts with .video-panel)
+  videoDiv.classList.toggle("active", tab === "video");
+  videoDiv.style.display = "";   // clear any inline display so CSS class takes over
+  if (tab === "recipes") loadSavedRecipes();
+  // Reset the video panel title when switching away and back
+  if (tab !== "video") {
+    document.querySelector(".video-panel-title").textContent = "🎬 Video Recipe Lab";
   }
 }
+
+// ── VIDEO LAB ─────────────────────────────────────────────────
+let videoData = { recipeText: "", quizQuestions: [], quizIndex: 0, quizScore: 0, videoId: "" };
+
+function extractYouTubeId(url) {
+  const m = url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+async function loadVideo() {
+  const urlInput = document.getElementById("video-url-input");
+  const url = urlInput.value.trim();
+  if (!url) { showToast("⚠️ Please paste a YouTube URL first"); return; }
+
+  const videoId = extractYouTubeId(url);
+  if (!videoId) { showToast("⚠️ Could not parse YouTube URL — use a youtube.com or youtu.be link"); return; }
+
+  videoData.videoId = videoId;
+  videoData.recipeText = "";
+  videoData.quizQuestions = [];
+  videoData.quizIndex = 0;
+  videoData.quizScore = 0;
+
+  // Reset the title while loading
+  document.querySelector(".video-panel-title").textContent = "🎬 Analyzing Video…";
+
+  // Show content area, hide empty state
+  document.getElementById("video-empty-state").style.display = "none";
+  document.getElementById("video-content").style.display = "block";
+  document.getElementById("video-load-btn").disabled = true;
+  document.getElementById("video-load-btn").textContent = "⏳ Analyzing…";
+
+  // Embed YouTube player
+  document.getElementById("video-embed-wrap").innerHTML =
+    `<iframe src="https://www.youtube.com/embed/${videoId}?enablejsapi=1" id="yt-player"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen></iframe>`;
+
+  // Reset panels to loading state
+  document.getElementById("recipe-extract-content").innerHTML = `<div class="quiz-loading">🔍 Extracting recipe from video…</div>`;
+  document.getElementById("timestamps-list").innerHTML = `<div class="quiz-loading">⏱️ Generating timestamps…</div>`;
+  document.getElementById("pantry-check-list").innerHTML = `<div class="quiz-loading">🧺 Checking your pantry…</div>`;
+  document.getElementById("quiz-area").innerHTML = `<div class="quiz-loading">🧠 Preparing quiz…</div>`;
+
+  // Disable action buttons
+  ["save-video-recipe-btn","cook-video-btn","send-video-chat-btn"].forEach(id => {
+    document.getElementById(id).disabled = true;
+  });
+
+  try {
+    // ── Call our Groq-powered backend endpoint ──
+    const res = await fetch(`${API_BASE}/video-analyze`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Secret": API_SECRET
+      },
+      body: JSON.stringify({
+        video_url: url,
+        session_id: currentSession
+      })
+    });
+
+    const responseData = await res.json();
+
+    if (!res.ok) {
+      const safeMsg = res.status === 429 ? "Too many requests — please wait a moment."
+                    : res.status === 400 ? "Invalid URL — please paste a valid YouTube link."
+                    : "Video analysis could not be completed. Please try again.";
+      document.getElementById("recipe-extract-content").innerHTML =
+        `<div style="color:#ff8a80;font-size:12px;">⚠️ ${escapeHtml(safeMsg)}</div>`;
+      document.getElementById("timestamps-list").innerHTML = `<div style="color:var(--dimmer);font-size:12px;padding:8px;">—</div>`;
+      document.getElementById("pantry-check-list").innerHTML = `<div style="color:var(--dimmer);font-size:12px;padding:8px;">—</div>`;
+      document.getElementById("quiz-area").innerHTML = `<div class="quiz-loading">—</div>`;
+      return;
+    }
+
+    const parsed = responseData.data;
+    // Show real video title if the backend fetched it
+    const realTitle = responseData.video_title || "";
+    if (realTitle) {
+      document.querySelector(".video-panel-title").textContent = `🎬 ${realTitle}`;
+    }
+
+    // ── Render Recipe ──
+    const r = parsed.recipe || {};
+    const ingredientsList = (r.ingredients || []).map(i => `<li>${escapeHtml(i)}</li>`).join("");
+    const stepsList = (r.steps || []).map(s => `<li>${escapeHtml(s)}</li>`).join("");
+    const tipsList = (r.tips || []).map(t => `<li><em>${escapeHtml(t)}</em></li>`).join("");
+
+    const recipeMarkdown = [
+      `## ${r.title || "Extracted Recipe"}`,
+      ``,
+      `**Servings:** ${r.servings || "—"} · **Time:** ${r.time || "—"} · **Skill:** ${r.skill_level || "—"}`,
+      ``,
+      `### Ingredients`,
+      ...(r.ingredients || []).map(i => `- ${i}`),
+      ``,
+      `### Steps`,
+      ...(r.steps || []).map((s, i) => `${i + 1}. ${s}`),
+      ``,
+      `### Tips`,
+      ...(r.tips || []).map(t => `- ${t}`)
+    ].join("\n");
+    videoData.recipeText = recipeMarkdown;
+
+    document.getElementById("recipe-extract-content").innerHTML = `
+      <div style="margin-bottom:8px;">
+        <strong style="color:var(--cream);font-size:14px;">${escapeHtml(r.title || "Recipe")}</strong>
+        <span style="font-size:11px;color:var(--dimmer);margin-left:8px;">
+          ${escapeHtml(r.servings || "")} · ${escapeHtml(r.time || "")} · ${escapeHtml(r.skill_level || "")}
+        </span>
+      </div>
+      <div style="margin-bottom:6px;font-size:11px;color:var(--amber);letter-spacing:1px;text-transform:uppercase;">Ingredients</div>
+      <ul style="padding-left:16px;margin:0 0 10px;font-size:12px;">${ingredientsList}</ul>
+      <div style="font-size:11px;color:var(--amber);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Steps</div>
+      <ol style="padding-left:16px;margin:0 0 10px;font-size:12px;">${stepsList}</ol>
+      ${tipsList ? `<div style="font-size:11px;color:var(--sage);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Chef's Tips</div><ul style="padding-left:16px;margin:0;font-size:12px;">${tipsList}</ul>` : ""}
+    `;
+    ["save-video-recipe-btn","cook-video-btn","send-video-chat-btn"].forEach(id => {
+      document.getElementById(id).disabled = false;
+    });
+
+    // ── Render Timestamps ──
+    const timestamps = parsed.timestamps || [];
+    if (timestamps.length) {
+      document.getElementById("timestamps-list").innerHTML = timestamps.map(t => `
+        <div class="ts-item" onclick="seekVideo(${parseInt(t.seconds) || 0})">
+          <span class="ts-badge">${escapeHtml(String(t.time))}</span>
+          <span class="ts-label">${escapeHtml(t.label)}</span>
+          <span style="color:var(--dimmer);font-size:14px;">▶</span>
+        </div>`).join("");
+    } else {
+      document.getElementById("timestamps-list").innerHTML = `<div style="color:var(--dimmer);font-size:12px;padding:8px;">No timestamps generated.</div>`;
+    }
+
+    // ── Pantry Check ──
+    renderPantryCheck(r.ingredients || []);
+
+    // ── Quiz ──
+    videoData.quizQuestions = parsed.quiz || [];
+    videoData.quizIndex = 0;
+    videoData.quizScore = 0;
+    if (videoData.quizQuestions.length) {
+      renderQuizQuestion();
+    } else {
+      document.getElementById("quiz-area").innerHTML = `<div class="quiz-loading">No quiz available for this video.</div>`;
+    }
+
+  } catch(err) {
+    console.error("Video load error:", err);
+    document.querySelector(".video-panel-title").textContent = "🎬 Video Recipe Lab";
+    document.getElementById("recipe-extract-content").innerHTML =
+      `<div style="color:#ff8a80;font-size:12px;">⚠️ Network error — make sure the backend is running at ${API_BASE}</div>`;
+    document.getElementById("timestamps-list").innerHTML = `<div style="color:var(--dimmer);font-size:12px;padding:8px;">—</div>`;
+    document.getElementById("pantry-check-list").innerHTML = `<div style="color:var(--dimmer);font-size:12px;padding:8px;">—</div>`;
+    document.getElementById("quiz-area").innerHTML = `<div class="quiz-loading">—</div>`;
+  } finally {
+    document.getElementById("video-load-btn").disabled = false;
+    document.getElementById("video-load-btn").textContent = "🎬 Analyze Video";
+  }
+}
+
+function seekVideo(seconds) {
+  const iframe = document.getElementById("yt-player");
+  if (!iframe) return;
+  // Use YouTube IFrame API postMessage to seek without reloading
+  try {
+    iframe.contentWindow.postMessage(
+      JSON.stringify({ event: "command", func: "seekTo", args: [seconds, true] }),
+      "*"
+    );
+    // Also try to play in case it was paused
+    iframe.contentWindow.postMessage(
+      JSON.stringify({ event: "command", func: "playVideo", args: [] }),
+      "*"
+    );
+  } catch(e) {
+    // Fallback: reload src with start param if postMessage fails
+    const base = iframe.src.split("?")[0].split("&")[0];
+    iframe.src = `${base}?start=${seconds}&autoplay=1&enablejsapi=1`;
+  }
+}
+
+function renderPantryCheck(ingredients) {
+  const list = document.getElementById("pantry-check-list");
+  if (!ingredients.length) { list.innerHTML = `<div style="color:var(--dimmer);font-size:12px;padding:8px;">No ingredients to check.</div>`; return; }
+
+  const normalizedPantry = pantryItems.map(p => p.toLowerCase().trim());
+  let haveCount = 0;
+  const items = ingredients.map(ing => {
+    const ingLower = ing.toLowerCase();
+    // Check if any pantry item appears in ingredient name or vice versa
+    const have = normalizedPantry.some(p => ingLower.includes(p) || p.includes(ingLower.split(" ")[0]));
+    if (have) haveCount++;
+    return { name: ing, have };
+  });
+
+  const itemsHtml = items.map(i => `
+    <div class="pantry-check-item">
+      <span class="pantry-check-icon">${i.have ? "✅" : "❌"}</span>
+      <span class="pantry-check-name ${i.have ? "have" : "missing"}">${escapeHtml(i.name)}</span>
+    </div>`).join("");
+
+  const missing = items.filter(i => !i.have).map(i => i.name);
+  const summaryColor = haveCount === items.length ? "#8fc99e" : haveCount >= items.length / 2 ? "var(--amber)" : "#ff8a80";
+  const summaryText = haveCount === items.length
+    ? "🎉 You have everything! Ready to cook."
+    : `${haveCount}/${items.length} ingredients in your pantry. Missing: ${missing.slice(0,3).join(", ")}${missing.length > 3 ? " + more" : ""}.`;
+
+  list.innerHTML = itemsHtml + `<div class="pantry-check-summary" style="color:${summaryColor}">${summaryText}</div>`;
+  if (missing.length && pantryItems.length === 0) {
+    list.innerHTML = `<div style="color:var(--dimmer);font-size:12px;padding:8px 0;">Add items to your pantry (sidebar → Pantry tab) to check what you have.</div>` + itemsHtml;
+  }
+}
+
+function renderQuizQuestion() {
+  const area = document.getElementById("quiz-area");
+  const q = videoData.quizQuestions[videoData.quizIndex];
+  if (!q) { area.innerHTML = `<div class="quiz-loading">No more questions!</div>`; return; }
+
+  const total = videoData.quizQuestions.length;
+  const optionsHtml = q.options.map((opt, i) => `
+    <button class="quiz-option" onclick="answerQuiz(this, ${i}, ${q.correct})">${escapeHtml(opt)}</button>`).join("");
+
+  area.innerHTML = `
+    <div class="quiz-container">
+      <div class="quiz-question-num">Question ${videoData.quizIndex + 1} of ${total} · Score: ${videoData.quizScore}/${videoData.quizIndex}</div>
+      <div class="quiz-question-text">${escapeHtml(q.question)}</div>
+      <div class="quiz-options">${optionsHtml}</div>
+      <div class="quiz-explanation" id="quiz-explanation" style="display:none;">${escapeHtml(q.explanation || "")}</div>
+      <div class="quiz-nav">
+        <span class="quiz-score" id="quiz-score-display"></span>
+        <button class="quiz-next-btn" id="quiz-next-btn" onclick="nextQuizQuestion()">
+          ${videoData.quizIndex < total - 1 ? "Next Question →" : "See Results"}
+        </button>
+      </div>
+    </div>`;
+}
+
+function answerQuiz(btn, chosen, correct) {
+  const allBtns = document.querySelectorAll(".quiz-option");
+  allBtns.forEach(b => { b.disabled = true; });
+  if (chosen === correct) {
+    btn.classList.add("correct");
+    videoData.quizScore++;
+    document.getElementById("quiz-score-display").textContent = "✅ Correct!";
+    document.getElementById("quiz-score-display").style.color = "#8fc99e";
+  } else {
+    btn.classList.add("wrong");
+    allBtns[correct].classList.add("correct");
+    document.getElementById("quiz-score-display").textContent = "❌ Not quite!";
+    document.getElementById("quiz-score-display").style.color = "#ff8a80";
+  }
+  document.getElementById("quiz-explanation").style.display = "block";
+  document.getElementById("quiz-next-btn").classList.add("visible");
+}
+
+function nextQuizQuestion() {
+  videoData.quizIndex++;
+  if (videoData.quizIndex >= videoData.quizQuestions.length) {
+    // Show final score
+    const total = videoData.quizQuestions.length;
+    const score = videoData.quizScore;
+    const pct = Math.round((score / total) * 100);
+    const emoji = pct >= 80 ? "🏆" : pct >= 60 ? "👨‍🍳" : "📚";
+    document.getElementById("quiz-area").innerHTML = `
+      <div class="quiz-container" style="text-align:center;padding:12px 0;">
+        <div style="font-size:40px;margin-bottom:10px;">${emoji}</div>
+        <div style="font-size:18px;color:var(--cream);font-family:'Playfair Display',serif;margin-bottom:6px;">${score}/${total} Correct</div>
+        <div style="font-size:13px;color:var(--dimmer);margin-bottom:16px;">${pct >= 80 ? "You're a pro! Great technique knowledge." : pct >= 60 ? "Good job! A few more sessions and you'll be a chef." : "Keep cooking and learning — practice makes perfect!"}</div>
+        <button class="quiz-next-btn visible" onclick="restartQuiz()">🔄 Retry Quiz</button>
+      </div>`;
+    return;
+  }
+  renderQuizQuestion();
+}
+
+function restartQuiz() {
+  videoData.quizIndex = 0;
+  videoData.quizScore = 0;
+  renderQuizQuestion();
+}
+
+function saveVideoRecipe() {
+  if (!videoData.recipeText) { showToast("⚠️ No recipe to save yet"); return; }
+  const firstLine = videoData.recipeText.split("\n")[0].replace(/[#*]/g,"").trim();
+  const title = firstLine.slice(0, 80) || "Video Recipe";
+  fetch(`${API_BASE}/recipes/save`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Api-Secret": API_SECRET },
+    body: JSON.stringify({ session_id: currentSession, title, content: videoData.recipeText })
+  }).then(r => {
+    if (r.ok) { showToast("🔖 Recipe saved to your cookbook!"); document.getElementById("save-video-recipe-btn").textContent = "✅ Saved"; document.getElementById("save-video-recipe-btn").disabled = true; }
+    else showToast("❌ Could not save — is the backend running?");
+  }).catch(() => showToast("❌ Network error"));
+}
+
+function cookVideoRecipe() {
+  if (!videoData.recipeText) return;
+  const lines = videoData.recipeText.split("\n");
+  cookingSteps = lines.filter(l => /^\d+[\.\)]/.test(l.trim())).map(l => l.replace(/^\d+[\.\)]\s*/,"").trim());
+  if (!cookingSteps.length) { showToast("⚠️ No numbered steps found"); return; }
+  cookingIndex = 0;
+  document.getElementById("cooking-modal").classList.add("active");
+  renderCookingStep();
+}
+
+function sendVideoToChat() {
+  if (!videoData.recipeText) return;
+  switchTab("chat", document.querySelectorAll(".tab")[0]);
+  const snippet = videoData.recipeText.slice(0, 300);
+  document.getElementById("msg-input").value = `I'm looking at this recipe from a video: ${snippet.slice(0,100)}… Can you give me tips on how to make it even better?`;
+  document.getElementById("msg-input").focus();
+  showToast("💬 Recipe context loaded into chat!");
+}
+
 
 // ── MESSAGING ──────────────────────────────────────────────────
 function appendMessage(role, html, imageData = null, recipeDetected = false, rawText = "") {
@@ -1083,7 +1654,12 @@ async function sendMessage() {
 
     const data = await res.json();
     if (!res.ok) {
-      appendMessage("ai", `<span style="color:#ff8a80">⚠️ ${escapeHtml(data.detail || "Something went wrong.")}</span>`);
+      // Show a safe generic message — never expose raw server error details
+      const safeMsg = res.status === 401 ? "Authentication failed. Check your API secret."
+                    : res.status === 429 ? "Too many requests — please wait a moment and try again."
+                    : res.status === 413 ? "Your message or image is too large. Please reduce the size."
+                    : "Something went wrong. Please try again.";
+      appendMessage("ai", `<span style="color:#ff8a80">⚠️ ${escapeHtml(safeMsg)}</span>`);
       return;
     }
 
